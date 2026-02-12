@@ -283,6 +283,12 @@ const SegmentDoors = ({
                 color="#fff8e8"
                 distance={10}
             />
+            {/* === THRESHOLD STRIPE === */}
+            <mesh position={[0, floorY + 0.01, 0]}>
+                <boxGeometry args={[frameWidth, 0.001, 0.05]} />
+                <meshBasicMaterial color="#000000" />
+            </mesh>
+
         </group>
     );
 };

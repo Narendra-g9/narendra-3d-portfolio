@@ -4,6 +4,7 @@ import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import MessagePaper from './MessagePaper';
+import SocialBarrel from './SocialBarrel';
 import { useScene } from '../../../../context/SceneContext';
 
 // ============================================
@@ -37,7 +38,7 @@ const CAMERA_SETTINGS = {
 
 // Experience phases
 const PHASE = {
-    ENTERING: 'entering',      // Camera entering room
+    ENTERING: 'entering',      // Camera entering room, looking at menu
     LOOKING_DOWN: 'looking_down', // Camera animating to look at dock
     WRITING: 'writing',        // User writing on paper
     ROLLING: 'rolling',        // Paper rolling into bottle
@@ -64,36 +65,20 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
     useEffect(() => {
         if (seaTexture) {
             seaTexture.wrapS = seaTexture.wrapT = THREE.RepeatWrapping;
-            // Geometry is 80x30.
-            // Previous 40x15 was too dense (looked gray).
-            // 1x1 was visible but stretched.
-            // Setting to a balanced repeat to show detail but tile correctly.
             seaTexture.repeat.set(6, 4);
             seaTexture.needsUpdate = true;
         }
 
         if (moloTexture) {
             moloTexture.wrapS = moloTexture.wrapT = THREE.RepeatWrapping;
-
-            // User feedback: Texture is "horizontal" but should be "vertical".
-            // Rotating 90 degrees to align planks along the length of the pier.
             moloTexture.center.set(0.5, 0.5);
             moloTexture.rotation = Math.PI / 2;
-
-            // After rotation, U axis of texture runs along V axis of geometry (Length).
-            // Dock Dimensions: 3 (width) x 7 (length).
-            // We want planks along the length? Or just rotated?
-            // If rotating, we swap the aspect ratio consideration.
-            // Let's try to fit the texture well.
             moloTexture.repeat.set(1, 1);
-
             moloTexture.needsUpdate = true;
         }
     }, [seaTexture, moloTexture]);
 
     useEffect(() => {
-        // Set rotation order to YXZ to prevent Gimbal lock and mixing of axes
-        // Y = Body turn (Yaw), X = Head tilt (Pitch), Z = Roll
         camera.rotation.order = 'YXZ';
     }, [camera]);
 
@@ -104,9 +89,8 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
 
     // Phase state
     const [currentPhase, setCurrentPhase] = useState(PHASE.ENTERING);
+    const [showSelection, setShowSelection] = useState(true);
 
-    // Store original camera rotation to restore later
-    const originalCameraRotation = useRef({ x: 0, y: 0, z: 0 });
     const hasAnimatedDown = useRef(false);
     // Latch exit state to prevent glitch
     const hasExitTriggered = useRef(false);
@@ -116,7 +100,6 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
     const waveRefs = useRef([]);
     const bottleRef = useRef();
     const bottleCapRef = useRef(); // Separate ref for cap animation
-    const paperRef = useRef();
 
     // Bottle cap animation state
     const [isCapAnimating, setIsCapAnimating] = useState(false);
@@ -132,15 +115,6 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
     const [emailUsername, setEmailUsername] = useState(''); // Part before @
     const writingProgress = useRef(0);
 
-    // ============================================
-    // 📷 CAMERA ANIMATION - Look down at dock
-    // Triggered after room is ready
-    // ============================================
-    // ============================================
-    // 📷 CAMERA CONTROL
-    // Simple Euler rotation to look down
-    // ============================================
-
     // Target rotation values
     const targetRotX = useRef(0);
     const targetRotY = useRef(0);
@@ -149,69 +123,69 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
     // Reset camera rotation when teleporting starts
     useEffect(() => {
         if (isTeleporting) {
-            // Reset camera control to prevent tilted camera after teleport
             hasAnimatedDown.current = false;
             hasExitTriggered.current = false;
             targetRotX.current = 0;
             targetRotY.current = 0;
             targetRotZ.current = 0;
             setCurrentPhase(PHASE.ENTERING);
+            setShowSelection(true); // Reset selection menu
         }
     }, [isTeleporting]);
 
+    // This effect now initializes the room but DOES NOT trigger look down
     useEffect(() => {
         if (hasSignaledReady.current && !hasAnimatedDown.current && showRoom) {
-            hasAnimatedDown.current = true;
-            hasExitTriggered.current = false; // Reset latch
-
-            // Capture landing rotation (usually 0,0,0)
-            targetRotX.current = camera.rotation.x;
-            targetRotY.current = camera.rotation.y;
-            targetRotZ.current = camera.rotation.z;
-
-            // Start sequence
-            const timer = setTimeout(() => {
-                setCurrentPhase(PHASE.LOOKING_DOWN);
-
-                // 1. SET X (Looking down)
-                targetRotX.current = CAMERA_SETTINGS.lookDownAngle;
-
-                // 2. SET Y (Turning)
-                if (CAMERA_SETTINGS.forceCenterY !== null) {
-                    targetRotY.current = CAMERA_SETTINGS.forceCenterY;
-                }
-                // else: keep targetRotY as captured (current rotation)
-
-                // 3. SET Z (Tilt)
-                if (CAMERA_SETTINGS.forceStraightZ !== null) {
-                    targetRotZ.current = CAMERA_SETTINGS.forceStraightZ;
-                }
-            }, 800);
-
-            // Phase transition
-            const phaseTimer = setTimeout(() => {
-                setCurrentPhase(PHASE.WRITING);
-            }, 2000);
-
-            return () => {
-                clearTimeout(timer);
-                clearTimeout(phaseTimer);
-            };
+            // Just ensure we are in entering phase
+            // We wait for user selection to trigger the rest
         }
 
         // EXIT ANIMATION CLEANUP
-        // When room is finally hidden, reset everything
         if (!showRoom) {
             hasExitTriggered.current = false;
             if (hasAnimatedDown.current) {
                 hasAnimatedDown.current = false;
                 setCurrentPhase(PHASE.ENTERING);
-                // Reset targets just in case
                 targetRotX.current = 0;
                 targetRotZ.current = 0;
+                setShowSelection(true);
             }
         }
     }, [hasSignaledReady.current, showRoom, camera]);
+
+    const handleMailSelect = () => {
+        setShowSelection(false);
+
+        // Trigger the look down sequence
+        hasAnimatedDown.current = true;
+        hasExitTriggered.current = false;
+
+        // Capture landing rotation (usually 0,0,0)
+        targetRotX.current = camera.rotation.x;
+        targetRotY.current = camera.rotation.y;
+        targetRotZ.current = camera.rotation.z;
+
+        // Start sequence directly
+        setCurrentPhase(PHASE.LOOKING_DOWN);
+
+        // 1. SET X (Looking down)
+        targetRotX.current = CAMERA_SETTINGS.lookDownAngle;
+
+        // 2. SET Y (Turning)
+        if (CAMERA_SETTINGS.forceCenterY !== null) {
+            targetRotY.current = CAMERA_SETTINGS.forceCenterY;
+        }
+
+        // 3. SET Z (Tilt)
+        if (CAMERA_SETTINGS.forceStraightZ !== null) {
+            targetRotZ.current = CAMERA_SETTINGS.forceStraightZ;
+        }
+
+        // Phase transition
+        setTimeout(() => {
+            setCurrentPhase(PHASE.WRITING);
+        }, 1500);
+    };
 
     // Frame Loop
     useFrame((state, delta) => {
@@ -224,21 +198,15 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
         }
 
         // 1. Camera Animation (Simple Lerp)
-        // Animate even if !showRoom to allow exit transition
-        if (hasAnimatedDown.current) {
+        if (hasAnimatedDown.current) { // Only animate if we started the 'look down' sequence
             const lerpSpeed = delta * CAMERA_SETTINGS.lerpSpeed;
 
             if (isExiting || hasExitTriggered.current) {
-                // EXIT MODE:
-                // 1. Reset X (look up/forward) and Z (tilt) to 0
+                // EXIT MODE
                 camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, 0, lerpSpeed);
                 camera.rotation.z = THREE.MathUtils.lerp(camera.rotation.z, 0, lerpSpeed);
-
-                // 2. DO NOT TOUCH Y!
-                // DoorSection controls Y during exit (turning back to corridor)
-                // If we lerp Y here, we fight the DoorSection animation
             } else {
-                // NORMAL MODE:
+                // NORMAL MODE (Look Down)
                 camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetRotX.current, lerpSpeed);
                 camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetRotY.current, lerpSpeed);
                 camera.rotation.z = THREE.MathUtils.lerp(camera.rotation.z, targetRotZ.current, lerpSpeed);
@@ -258,87 +226,72 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
 
         // 3. Bottle Cap Animation (lift up)
         if (isCapAnimating && bottleCapRef.current) {
-            // Increase progress
             if (capProgress.current < 1) {
                 capProgress.current = Math.min(1, capProgress.current + delta * 0.6);
             }
-
-            // Easing for smooth motion
             const t = capProgress.current;
-            const eased = 1 - Math.pow(1 - t, 3); // ease out cubic
-
-            // Just lift cap up gently (Y in local space since bottle is rotated)
-            bottleCapRef.current.position.y = eased * 0.5; // Lift up
+            const eased = 1 - Math.pow(1 - t, 3);
+            bottleCapRef.current.position.y = eased * 0.5;
         }
 
-        // 4. Bottle Cap Closing Animation (after paper is inserted)
+        // 4. Bottle Cap Closing Animation
         if (isCapClosing && bottleCapRef.current) {
-            // Increase progress
             if (capCloseProgress.current < 1) {
                 capCloseProgress.current = Math.min(1, capCloseProgress.current + delta * 0.8);
             }
-
-            // Easing for smooth motion
             const t = capCloseProgress.current;
-            const eased = 1 - Math.pow(1 - t, 3); // ease out cubic
+            const eased = 1 - Math.pow(1 - t, 3);
+            bottleCapRef.current.position.y = 0.5 * (1 - eased);
 
-            // Move cap back down from 0.5 to 0 (reverse of opening)
-            bottleCapRef.current.position.y = 0.5 * (1 - eased); // Close cap
-
-            // Start writing animation when cap is fully closed
             if (capCloseProgress.current >= 1 && !isWriting && emailUsername) {
                 setIsWriting(true);
                 writingProgress.current = 0;
             }
         }
 
-        // 5. Writing Animation (typewriter effect on bottle paper)
+        // 5. Writing Animation
         if (isWriting && emailUsername) {
-            writingProgress.current += delta * 3; // Speed of writing
-
-            // Calculate how many characters to show
+            writingProgress.current += delta * 3;
             const charsToShow = Math.min(
                 Math.floor(writingProgress.current),
                 emailUsername.length
             );
-
             setDisplayedText(emailUsername.slice(0, charsToShow));
         }
     });
 
-    // Handler for when paper fold completes
     const handleFoldComplete = useCallback(() => {
         console.log('📜 Paper fold complete - starting cap animation');
         setIsCapAnimating(true);
         capProgress.current = 0;
     }, []);
 
-    // Handler for when paper is inserted into bottle
     const handleInsertComplete = useCallback(() => {
         console.log('🍾 Paper inserted - closing cap');
         setIsCapClosing(true);
         capCloseProgress.current = 0;
     }, []);
 
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1000); // 1000px breakpoint to catch tablets/phones
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     return (
         <group position={[0, -0.7, -5]}>
-            {/* ============================================
-                🌅 SKY BACKDROP
-            ============================================ */}
-            <mesh position={[0, 10, -50]}>
-                <planeGeometry args={[150, 80]} />
-                <meshBasicMaterial color="#e8e8e8" side={THREE.DoubleSide} />
-            </mesh>
-
-            {/* ============================================
-                🌊 OCEAN WAVE LAYERS
-            ============================================ */}
+            {/* 🌊 OCEAN WAVE LAYERS */}
             <group position={[0, -1, -8]}>
                 {Array.from({ length: WAVE_LAYERS }).map((_, i) => (
                     <mesh
                         key={i}
                         ref={el => waveRefs.current[i] = el}
-                        position={[0, -i * 0.1, -i * 8]} // Spread out vertically
+                        position={[0, -i * 0.1, -i * 8]}
                         rotation={[-Math.PI / 2.5, 0, 0]}
                     >
                         <planeGeometry args={[80, 30]} />
@@ -354,94 +307,127 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
                 ))}
             </group>
 
-            {/* ============================================
-                🏖️ DOCK / MOLO
-                Now a flat plane to remove the "block" underneath
-            ============================================ */}
+            {/* 🛢️ SOCIAL BARRELS (Floating in water) */}
+            {/* LINKEDIN */}
+            <SocialBarrel
+                position={isMobile ? [-1.2, 0.5, -10] : [-3, 0.5, -10]}
+                rotation={[0, 0.2, 0]}
+                texturePath="/textures/contact/linkedinlink.png"
+                onClick={() => window.open('https://www.linkedin.com/in/tomasz-szmajda-259337305/', '_blank')}
+            />
+            {/* GITHUB */}
+            <SocialBarrel
+                position={isMobile ? [-1.5, -0.3, -7] : [-5, -0.3, -8]}
+                rotation={[0, 0.3, 0]}
+                texturePath="/textures/contact/githublink.png"
+                onClick={() => window.open('https://github.com/ITomPoland', '_blank')}
+            />
+            {/* FACEBOOK */}
+            <SocialBarrel
+                position={isMobile ? [1.2, 0.5, -10] : [3, 0.5, -10]}
+                rotation={[0, -0.2, 0]}
+                texturePath="/textures/contact/facebooklink.png"
+                onClick={() => window.open('https://www.facebook.com/tomasz.szmajda.58/', '_blank')}
+            />
+            {/* INSTAGRAM */}
+            <SocialBarrel
+                position={isMobile ? [1.5, -0.3, -7] : [5, -0.3, -8]}
+                rotation={[0, -0.3, 0]}
+                texturePath="/textures/contact/instagramlink.png"
+                onClick={() => window.open('https://www.instagram.com/itom.dev/', '_blank')}
+            />
+            {/* MAIL (Triggers animation) */}
+            <SocialBarrel
+                position={isMobile ? [0, -0.7, -6] : [0, -0.7, -7]}
+                rotation={[0, 0, 0]}
+                texturePath="/textures/contact/maillink.png"
+                onClick={handleMailSelect}
+            />
+
+
+            {/* 🏖️ DOCK / MOLO */}
             <mesh
-                position={[0, 0.05, 1.8]} // Slightly above water
-                rotation={[-Math.PI / 2, 0, 0]} // Rotate to be flat
+                position={[0, 0.05, 1.8]}
+                rotation={[-Math.PI / 2, 0, 0]}
             >
                 <planeGeometry args={[2.5, 7]} />
                 <meshStandardMaterial
                     map={moloTexture}
                     color="#ffffff"
                     roughness={0.8}
-                    side={THREE.DoubleSide} // Ensure visible from below if needed (e.g. reflection)
+                    side={THREE.DoubleSide}
                     transparent
                 />
             </mesh>
 
-            {/* ============================================
-                📜 INTERACTIVE MESSAGE PAPER
-                Always visible (form UI hides during fold animation)
-            ============================================ */}
-            <MessagePaper
-                position={[0, 0.07, 2]} // Raised slightly to avoid flickering with the dock (z-fighting)
-                onSend={(data) => {
-                    console.log('📬 Contact form submitted:', data);
-                    // Extract username from email (part before @)
-                    if (data.email) {
-                        const username = data.email.split('@')[0];
-                        setEmailUsername(username);
-                        console.log('📧 Email username for writing:', username);
-                    }
-                }}
-                onFoldComplete={handleFoldComplete}
-                onInsertComplete={handleInsertComplete}
-            />
+            {/* 📜 INTERACTIVE MESSAGE PAPER */}
+            {/* Only show when not selecting or when diving in? 
+                Actually we want it there but enabled only after selection
+            */}
+            <group visible={!showSelection}>
+                <MessagePaper
+                    position={[0, 0.07, 2]}
+                    onSend={(data) => {
+                        console.log('📬 Contact form submitted:', data);
+                        if (data.email) {
+                            const username = data.email.split('@')[0];
+                            setEmailUsername(username);
+                            console.log('📧 Email username for writing:', username);
+                        }
+                    }}
+                    onFoldComplete={handleFoldComplete}
+                    onInsertComplete={handleInsertComplete}
+                />
+            </group>
 
-            {/* ============================================
-                🍾 BOTTLE - Assembled from layers
-                Layers: Paper (inside) -> Body (glass) -> Cap (top)
-            ============================================ */}
+            {/* 🍾 BOTTLE - Assembled from layers */}
             <group
                 ref={bottleRef}
-                position={[0.8, 0.15, 2.5]} // Raised to 0.12 to be above paper (at 0.07)
-                rotation={[-Math.PI / 2, 0, -Math.PI / 2]} // Lying on side, rotated -90 deg to flip vertical orientation 
+                position={[0.8, 0.15, 2.5]}
+                rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
             >
-                {/* 1. PAPER IN BOTTLE (Bottom layer - behind glass) */}
+                {/* Paper in bottle (behind glass) */}
                 <mesh position={[0, -0.01, 0.02]}>
                     <planeGeometry args={[1.5, 1.0]} />
                     <meshStandardMaterial
                         map={bottlePaper}
                         transparent
                         side={THREE.DoubleSide}
-                        roughness={0.8} // Paper is rough
+                        roughness={0.8}
                     />
                 </mesh>
 
-                {/* 2. BOTTLE BODY (Middle layer - glass) */}
+                {/* Bottle body (glass) */}
                 <mesh position={[0, 0, 0]}>
                     <planeGeometry args={[1.5, 1.0]} />
                     <meshStandardMaterial
                         map={bottleBody}
                         transparent
-                        opacity={0.8} // Semi-transparent glass
+                        opacity={0.8}
                         side={THREE.DoubleSide}
-                        roughness={0.2} // Glass is smooth/shiny
+                        roughness={0.2}
                         metalness={0.1}
                     />
                 </mesh>
 
-                {/* 3. BOTTLE CAP (Top layer - in front) */}
+                {/* Bottle cap */}
                 <mesh ref={bottleCapRef} position={[0, 0, 0.001]}>
                     <planeGeometry args={[1.5, 1.0]} />
                     <meshStandardMaterial
                         map={bottleCap}
                         transparent
                         side={THREE.DoubleSide}
-                        roughness={0.4} // Plastic/Metal cap
+                        roughness={0.4}
                     />
                 </mesh>
 
-                {/* 4. ANIMATED TEXT on paper in bottle (handwriting effect) */}
+                {/* Animated text on paper in bottle */}
                 {displayedText && (
                     <Text
-                        position={[0, 0.15, 0.025]} // Positioned on the paper inside bottle
+                        position={[0, 0.15, 0.025]}
                         fontSize={0.08}
                         color="#1a1a1a"
-                        font="/fonts/CabinSketch-Regular.ttf" // Handwriting-style font
+                        font="/fonts/CabinSketch-Regular.ttf"
                         anchorX="center"
                         anchorY="middle"
                         maxWidth={0.8}
@@ -450,18 +436,6 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
                     </Text>
                 )}
             </group>
-
-            {/* ============================================
-                📍 DEBUG - Current phase indicator
-            ============================================ */}
-            <Text
-                position={[0, 2, 0]}
-                fontSize={0.15}
-                color="#333333"
-                anchorX="center"
-            >
-                Phase: {currentPhase}
-            </Text>
         </group>
     );
 };

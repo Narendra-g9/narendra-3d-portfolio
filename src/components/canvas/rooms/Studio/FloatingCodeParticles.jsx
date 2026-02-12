@@ -66,28 +66,29 @@ const getRandomSymbol = () => {
 };
 
 // Generate particle data once
+// Generate particle data once
 const generateParticles = () => {
     const particles = [];
+
+    // Bounds for 2D plane
+    const X_SPREAD = 50; // Match WRAP_WIDTH in useFrame
+    const Z_MIN = -4; // Behind monitors (monitors at ~ +/- 2.2 radius)
+    const Z_MAX = -8; // Further back
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
         const symbol = getRandomSymbol();
 
-        // Only back half (Z always negative) but wide X spread for side visibility
-        // Angle from -90° to +90° (back hemisphere)
-        const angle = (Math.random() - 0.5) * Math.PI + Math.PI; // PI/2 to 3PI/2 = back half
-        const radius = MIN_RADIUS + Math.random() * (MAX_RADIUS - MIN_RADIUS);
+        // Random 3D position in a flat plane interaction volume
+        const x = (Math.random() - 0.5) * X_SPREAD;
         const y = (Math.random() - 0.5) * VERTICAL_SPREAD;
-
-        // Wider X spread for side visibility
-        const x = Math.cos(angle) * radius * 1.5; // 1.5x wider on X
-        const z = Math.sin(angle) * radius;
+        const z = Z_MIN + Math.random() * (Z_MAX - Z_MIN);
 
         particles.push({
             id: i,
             symbol,
-            position: new THREE.Vector3(x, y, z),
-            baseAngle: angle,
-            radius,
+            position: new THREE.Vector3(x, y, z), // Initial position
+            initialX: x, // Store for logic
+            z: z,        // Store for logic
             initialY: y,
             rotation: Math.random() * Math.PI * 2,
             driftSpeed: 0.1 + Math.random() * 0.2,
@@ -119,16 +120,21 @@ const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
 
         // Read velocity from parent
         const towerRotation = towerRotationRef?.current || 0;
-        const fallVelocity = fallOffsetRef?.current || 0; // This is now VELOCITY
+        const fallVelocity = fallOffsetRef?.current || 0;
 
         // Smooth the rotation
         smoothRotation.current = THREE.MathUtils.lerp(smoothRotation.current, towerRotation, 0.08);
+
+        // Define X wrapping bounds - wide enough to cover screen
+        const WRAP_WIDTH = 50; // Total width before wrapping
+        const HALF_WIDTH = WRAP_WIDTH / 2;
 
         particles.forEach((particle, index) => {
             const mesh = meshRefs.current[index];
             if (!mesh) return;
 
-            // Accumulate Y offset based on velocity (parallax - particles move slower than tower)
+            // --- VERTICAL MOVEMENT (Unchanged) ---
+            // Accumulate Y offset based on velocity
             particleYOffsets.current[index] -= fallVelocity * delta * particle.parallaxFactor * 1.5;
 
             // Gentle floating motion
@@ -137,7 +143,7 @@ const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
             // Calculate final Y position
             let finalY = particle.initialY + particleYOffsets.current[index] + floatY;
 
-            // SEAMLESS LOOP - wrap around when out of bounds
+            // START: Vertical Loop
             while (finalY < LOOP_BOTTOM) {
                 particleYOffsets.current[index] += LOOP_HEIGHT;
                 finalY += LOOP_HEIGHT;
@@ -146,17 +152,45 @@ const FloatingCodeParticles = ({ towerRotationRef, fallOffsetRef }) => {
                 particleYOffsets.current[index] -= LOOP_HEIGHT;
                 finalY -= LOOP_HEIGHT;
             }
-
-            // Update Y position
             mesh.position.y = finalY;
 
-            // Gentle self-rotation
-            mesh.rotation.z = particle.rotation + time * particle.rotationSpeed;
+            // --- HORIZONTAL MOVEMENT (New 2D Logic) ---
 
-            // Orbit with tower (parallax - slower than tower)
-            const orbitOffset = smoothRotation.current * particle.parallaxFactor * 0.3;
-            mesh.position.x = Math.cos(particle.baseAngle + orbitOffset) * particle.radius;
-            mesh.position.z = Math.sin(particle.baseAngle + orbitOffset) * particle.radius;
+            // Link horizontal position to tower rotation
+            // rotation * factor -> linear translation
+            // "Rotate Left" (positive/negative depending on setup) -> "Fly Left"
+            // We'll multiply rotation by a scalar. 
+            // If the user wants "rotate left -> fly left", we need to check the sign.
+            // Usually: Rotate Tower Left = Tower rotates +Y (or -Y). 
+            // If Tower Rotates +Y (Left), we want Particles to move -X (Left)? 
+            // Or "fly to the left" means -X velocity.
+            // Let's use a standard parallax coefficient.
+
+            const rotationOffset = smoothRotation.current * 5.0; // 5.0 is the "gear ratio" of rotation to pixels
+
+            // Calculate raw X based on initial position + rotation offset
+            // We subtract rotationOffset to make them move opposite to creating depth?
+            // User said: "jak sie obraca wierza w lewo to te cząsteczki leca w lewo"
+            // If I rotate the tower to the left (counter-clockwise, typically +RotationY), 
+            // the "face" sets moves left. 
+            // So if `towerRotation` increases, we want `x` to decrease?
+            // Let's try `initialX + rotationOffset`. If rotation is positive, X gets bigger (Right).
+            // This might mean "Rotate Left" -> "Fly Right" visually?
+            // Let's assume positive correlation first: Rotate Right -> Fly Right.
+
+            let finalX = particle.initialX + (rotationOffset * particle.parallaxFactor);
+
+            // Manual modulo for wrapping between -HALF_WIDTH and +HALF_WIDTH
+            // ((x + half) % width + width) % width - half
+            finalX = ((finalX + HALF_WIDTH) % WRAP_WIDTH + WRAP_WIDTH) % WRAP_WIDTH - HALF_WIDTH;
+
+            mesh.position.x = finalX;
+
+            // --- DEPTH (Fixed Plane) ---
+            mesh.position.z = particle.z; // Fixed plane behind monitors
+
+            // Gentle self-rotation (unchanged)
+            mesh.rotation.z = particle.rotation + time * particle.rotationSpeed;
         });
     });
 

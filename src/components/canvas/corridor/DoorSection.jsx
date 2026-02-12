@@ -426,13 +426,9 @@ const DoorSection = ({
                 //    OR after fallback timeout for rooms without onReady support
                 setShouldRenderRoom(true);
 
-                // During FAST teleport, skip the 8000ms timeout - just open immediately
-                if (useFastMode) {
-                    roomReadyRef.current = true;
-                    setRoomReady(true);
-                    openDoor(true); // Pass fast mode flag
-                    return;
-                }
+                // During FAST teleport, we still want to WAIT for the room to be ready!
+                // So we do NOT open immediately anymore. We let the onReady callback handle it.
+                // But we still set the flag so handleRoomReady knows to use fast animation.
 
                 // Fallback: If room doesn't call onReady within 8000ms, open door anyway
                 // This ensures all rooms work even if they don't implement onReady
@@ -441,9 +437,10 @@ const DoorSection = ({
                         console.warn(`[DoorSection ${label}] Room load timeout - forcing open`);
                         roomReadyRef.current = true;
                         setRoomReady(true);
-                        openDoor(false);
+                        // If it timed out, we still use the current mode preference
+                        openDoor(useFastMode);
                     }
-                }, 8000); // Increased from 500ms to 8000ms to prevent premature opening
+                }, 8000);
             }
         });
     }, [camera, side, isOpen, isAnimating, setCameraOverride, isFastTeleport]);
@@ -533,8 +530,9 @@ const DoorSection = ({
 
         roomReadyRef.current = true;
         setRoomReady(true);
-        openDoor(false); // Normal mode (not fast)
-    }, [openDoor]);
+        // Use the current context state to decide if we should do a fast open
+        openDoor(isFastTeleport);
+    }, [openDoor, isFastTeleport]);
 
     // Exit room function - TRUE REVERSE animation (like rewinding video)
     const exitRoom = useCallback(() => {
