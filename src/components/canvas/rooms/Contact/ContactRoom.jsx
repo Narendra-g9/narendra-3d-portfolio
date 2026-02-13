@@ -52,14 +52,14 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
     const { isTeleporting } = useScene();
 
     // Load Sea Texture
-    const seaTexture = useTexture("/textures/contact/faletopdown.png");
+    const seaTexture = useTexture("/textures/contact/faletopdown.webp");
     // Load Molo Texture
-    const moloTexture = useTexture("/textures/contact/molo.png");
+    const moloTexture = useTexture("/textures/contact/molo.webp");
 
     // Load Bottle Textures
-    const bottleBody = useTexture("/textures/contact/czescglownabutelki.png");
-    const bottleCap = useTexture("/textures/contact/zakretkabutelki.png");
-    const bottlePaper = useTexture("/textures/contact/papiernabutelke.png");
+    const bottleBody = useTexture("/textures/contact/czescglownabutelki.webp");
+    const bottleCap = useTexture("/textures/contact/zakretkabutelki.webp");
+    const bottlePaper = useTexture("/textures/contact/papiernabutelke.webp");
 
     // Configure texture repeating (1:1 scale)
     useEffect(() => {
@@ -312,35 +312,35 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
             <SocialBarrel
                 position={isMobile ? [-1.2, 0.5, -10] : [-3, 0.5, -10]}
                 rotation={[0, 0.2, 0]}
-                texturePath="/textures/contact/linkedinlink.png"
+                texturePath="/textures/contact/linkedinlink.webp"
                 onClick={() => window.open('https://www.linkedin.com/in/tomasz-szmajda-259337305/', '_blank')}
             />
             {/* GITHUB */}
             <SocialBarrel
                 position={isMobile ? [-1.5, -0.3, -7] : [-5, -0.3, -8]}
                 rotation={[0, 0.3, 0]}
-                texturePath="/textures/contact/githublink.png"
+                texturePath="/textures/contact/githublink.webp"
                 onClick={() => window.open('https://github.com/ITomPoland', '_blank')}
             />
             {/* FACEBOOK */}
             <SocialBarrel
                 position={isMobile ? [1.2, 0.5, -10] : [3, 0.5, -10]}
                 rotation={[0, -0.2, 0]}
-                texturePath="/textures/contact/facebooklink.png"
+                texturePath="/textures/contact/facebooklink.webp"
                 onClick={() => window.open('https://www.facebook.com/tomasz.szmajda.58/', '_blank')}
             />
             {/* INSTAGRAM */}
             <SocialBarrel
                 position={isMobile ? [1.5, -0.3, -7] : [5, -0.3, -8]}
                 rotation={[0, -0.3, 0]}
-                texturePath="/textures/contact/instagramlink.png"
+                texturePath="/textures/contact/instagramlink.webp"
                 onClick={() => window.open('https://www.instagram.com/itom.dev/', '_blank')}
             />
             {/* MAIL (Triggers animation) */}
             <SocialBarrel
                 position={isMobile ? [0, -0.7, -6] : [0, -0.7, -7]}
                 rotation={[0, 0, 0]}
-                texturePath="/textures/contact/maillink.png"
+                texturePath="/textures/contact/maillink.webp"
                 onClick={handleMailSelect}
             />
 

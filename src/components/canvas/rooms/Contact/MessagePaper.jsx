@@ -209,8 +209,8 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInser
     };
 
     // Load textures
-    const paperTexture = useTexture('/textures/contact/paper_form.png');
-    const buttonTexture = useTexture('/textures/contact/send_button.png');
+    const paperTexture = useTexture('/textures/contact/paper_form.webp');
+    const buttonTexture = useTexture('/textures/contact/send_button.webp');
 
     // Configure textures
     useEffect(() => {

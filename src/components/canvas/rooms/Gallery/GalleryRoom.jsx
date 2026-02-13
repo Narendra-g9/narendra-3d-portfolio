@@ -9,7 +9,7 @@ import GalleryClouds from './GalleryClouds';
 
 // Define the unique projects and their textures
 const UNIQUE_PROJECTS = [
-    { id: 'bio', title: 'Bio', front: '/textures/gallery/bioprzod.jpg', back: '/textures/gallery/biotyl.webp', url: 'https://example.com' },
+    { id: 'bio', title: 'Bio', front: '/textures/gallery/bioprzod.webp', back: '/textures/gallery/biotyl.webp', url: 'https://example.com' },
     { id: 'monetune', title: 'Monetune', front: '/textures/gallery/monetuneprzod.webp', back: '/textures/gallery/monetunetyl.webp', url: 'https://example.com' },
     { id: 'timber', title: 'TimberKitty', front: '/textures/gallery/timberkittyprzod.webp', back: '/textures/gallery/timberkittytyl.webp', url: 'https://example.com' },
     { id: 'young', title: 'YoungMulti', front: '/textures/gallery/youngmultiprzod.webp', back: '/textures/gallery/youngmultityl.webp', url: 'https://example.com' },
@@ -158,7 +158,7 @@ const GalleryRoom = ({ showRoom, onReady }) => {
     });
 
     // --- GEOMETRY & MATERIALS ---
-    const floorTexture = useTexture('/textures/gallery/floor.jpg');
+    const floorTexture = useTexture('/textures/gallery/floor.webp');
     const railingTexture = useTexture('/textures/gallery/railing.webp');
     const housesTexture = useTexture('/textures/gallery/domki.webp');
     const cityTexture = useTexture('/textures/gallery/miastotlo.webp');

@@ -695,7 +695,7 @@ const DoorSection = ({
     const handlePointerEnter = () => {
         if (isOpen || isAnimating) return;
         setIsHovered(true);
-        document.body.style.cursor = "url('/cursors/cursor-pointer.png'), pointer";
+        document.body.style.cursor = "url('/cursors/cursor-pointer.webp'), pointer";
 
         // Slightly open door on hover
         if (doorRef.current) {

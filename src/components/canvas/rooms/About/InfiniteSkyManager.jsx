@@ -124,7 +124,7 @@ const InfiniteSkyManager = ({ scrollProgress = 0 }) => {
  */
 const IntroMilestone = ({ z, scrollProgress }) => {
     // Load avatar texture
-    const avatarTexture = useLoader(THREE.TextureLoader, '/textures/about/awatarnachmurce.png');
+    const avatarTexture = useLoader(THREE.TextureLoader, '/textures/about/awatarnachmurce.webp');
     const { camera } = useThree();
 
     // Refs for all animated elements
@@ -287,7 +287,28 @@ const AwardsMilestone = ({ z, scrollProgress }) => {
     const sotyRef = useRef();
     const sotdRef = useRef();
     const sotmRef = useRef();
-    const honorableRef = useRef();
+    const featuredRef = useRef();
+
+    // Load textures
+    const sotyTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTY.webp');
+    const sotdTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTD.webp');
+    const sotmTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTM.webp');
+    const featuredTexture = useLoader(THREE.TextureLoader, '/textures/about/FEATURED.webp');
+
+    // Color space fix
+    sotyTexture.colorSpace = THREE.SRGBColorSpace;
+    sotdTexture.colorSpace = THREE.SRGBColorSpace;
+    sotmTexture.colorSpace = THREE.SRGBColorSpace;
+    featuredTexture.colorSpace = THREE.SRGBColorSpace;
+
+    // Calculate aspect ratios
+    const sotyAspect = sotyTexture.image ? sotyTexture.image.width / sotyTexture.image.height : 1.5;
+    const sotdAspect = sotdTexture.image ? sotdTexture.image.width / sotdTexture.image.height : 1.5;
+    const sotmAspect = sotmTexture.image ? sotmTexture.image.width / sotmTexture.image.height : 1.5;
+    const featuredAspect = featuredTexture.image ? featuredTexture.image.width / featuredTexture.image.height : 1.5;
+
+    // Base height for cards
+    const cardHeight = 2.5;
 
     useFrame((state) => {
         if (!groupRef.current) return;
@@ -303,7 +324,7 @@ const AwardsMilestone = ({ z, scrollProgress }) => {
         // FIX: Use consistent distance based on scrollProgress + offset
         const distanceZ = z + scrollProgress - 55;
 
-        // 1. Standard reveal (SOTD, SOTM, Honorable)
+        // 1. Standard reveal (SOTD, SOTM, Featured)
         // === EDYTUJ TUTAJ (AWARDS 1) ===
         const revealStart = -120;
         const revealEnd = -50; // Wolniejsze wyłanianie
@@ -340,8 +361,8 @@ const AwardsMilestone = ({ z, scrollProgress }) => {
         if (sotmRef.current) {
             sotmRef.current.position.x = revealFactor * spreadX;
         }
-        if (honorableRef.current) {
-            honorableRef.current.position.y = 0.5 - revealFactor * 4;
+        if (featuredRef.current) {
+            featuredRef.current.position.y = 0.5 - revealFactor * 4;
         }
 
         // Apply SOTY movement (Upwards)
@@ -365,69 +386,52 @@ const AwardsMilestone = ({ z, scrollProgress }) => {
                 ✦ AWARDS ✦
             </Text>
 
-            {/* === HONORABLE (furthest back, rendered first) === */}
-            <group ref={honorableRef} position={[0, 0.5, -0.7]}>
+            {/* === FEATURED (furthest back, rendered first) === */}
+            <group ref={featuredRef} position={[0, 0.5, -0.7]}>
                 <mesh>
-                    <planeGeometry args={[3, 2]} />
-                    <meshBasicMaterial color="#fef2f2" />
+                    <planeGeometry args={[cardHeight * featuredAspect, cardHeight]} />
+                    <meshBasicMaterial
+                        map={featuredTexture}
+                        transparent
+                        side={THREE.DoubleSide}
+                    />
                 </mesh>
-                <Text position={[0, 0.3, 0.1]} fontSize={0.3} color="#1a1a1a" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    Honorable Mention
-                </Text>
-                <Text position={[0, -0.3, 0.1]} fontSize={0.5} color="#ef4444" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    ★★
-                </Text>
             </group>
 
             {/* === SOTD (behind SOTY, rendered second) === */}
             <group ref={sotdRef} position={[0, 0.5, -0.5]}>
                 <mesh>
-                    <planeGeometry args={[3, 2.5]} />
-                    <meshBasicMaterial color="#fffbeb" />
+                    <planeGeometry args={[cardHeight * sotdAspect, cardHeight]} />
+                    <meshBasicMaterial
+                        map={sotdTexture}
+                        transparent
+                        side={THREE.DoubleSide}
+                    />
                 </mesh>
-                <Text position={[0, 0.5, 0.1]} fontSize={0.35} color="#1a1a1a" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    SOTD
-                </Text>
-                <Text position={[0, 0, 0.1]} fontSize={0.25} color="#666666" anchorX="center" font="/fonts/CabinSketch-Regular.ttf">
-                    Site of the Day
-                </Text>
-                <Text position={[0, -0.5, 0.1]} fontSize={0.5} color="#f59e0b" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    ★★
-                </Text>
             </group>
 
             {/* === SOTM (behind SOTY, rendered third) === */}
             <group ref={sotmRef} position={[0, 0.5, -0.2]}>
                 <mesh>
-                    <planeGeometry args={[3, 2.5]} />
-                    <meshBasicMaterial color="#f0fdf4" />
+                    <planeGeometry args={[cardHeight * sotmAspect, cardHeight]} />
+                    <meshBasicMaterial
+                        map={sotmTexture}
+                        transparent
+                        side={THREE.DoubleSide}
+                    />
                 </mesh>
-                <Text position={[0, 0.5, 0.1]} fontSize={0.35} color="#1a1a1a" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    SOTM
-                </Text>
-                <Text position={[0, 0, 0.1]} fontSize={0.25} color="#666666" anchorX="center" font="/fonts/CabinSketch-Regular.ttf">
-                    Site of the Month
-                </Text>
-                <Text position={[0, -0.5, 0.1]} fontSize={0.4} color="#999999" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    Coming Soon
-                </Text>
             </group>
 
             {/* === SOTY (front, center, rendered LAST = always on top) === */}
             <group ref={sotyRef} position={[0, 0.5, 0]}>
                 <mesh>
-                    <planeGeometry args={[3, 2.5]} />
-                    <meshBasicMaterial color="#f5f5f5" />
+                    <planeGeometry args={[cardHeight * sotyAspect, cardHeight]} />
+                    <meshBasicMaterial
+                        map={sotyTexture}
+                        transparent
+                        side={THREE.DoubleSide}
+                    />
                 </mesh>
-                <Text position={[0, 0.5, 0.1]} fontSize={0.35} color="#1a1a1a" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    SOTY
-                </Text>
-                <Text position={[0, 0, 0.1]} fontSize={0.25} color="#666666" anchorX="center" font="/fonts/CabinSketch-Regular.ttf">
-                    Site of the Year
-                </Text>
-                <Text position={[0, -0.5, 0.1]} fontSize={0.4} color="#999999" anchorX="center" font="/fonts/CabinSketch-Bold.ttf">
-                    Coming Soon
-                </Text>
             </group>
         </group>
     );
@@ -444,8 +448,8 @@ const JourneyMilestone = ({ z, scrollProgress }) => {
     const freelanceRef = useRef();
 
     // Load textures
-    const uoTexture = useLoader(THREE.TextureLoader, '/textures/about/uowyspa.png');
-    const freelanceTexture = useLoader(THREE.TextureLoader, '/textures/about/freelancewyspa.png');
+    const uoTexture = useLoader(THREE.TextureLoader, '/textures/about/uowyspa.webp');
+    const freelanceTexture = useLoader(THREE.TextureLoader, '/textures/about/freelancewyspa.webp');
 
     // Texture settings
     uoTexture.colorSpace = THREE.SRGBColorSpace;
@@ -601,20 +605,20 @@ const JourneyMilestone = ({ z, scrollProgress }) => {
 // === EDYTUJ WYSOKOŚĆ TUTAJ (zmień wartość 'y' dla każdego balona) ===
 const BALLOON_CONFIG = [
     // Large balloons (main skills) - front and center
-    { texture: '/textures/about/reactduzybalon.png', size: 'large', x: -2.5, y: 2, z: 0.3, phase: 0 },
-    { texture: '/textures/about/threejsduzybalon.png', size: 'large', x: 2.5, y: 2.5, z: 0.2, phase: 1.5 },
-    { texture: '/textures/about/GSAPduzybalon.png', size: 'large', x: 0, y: 3, z: 0.5, phase: 3 },
+    { texture: '/textures/about/reactduzybalon.webp', size: 'large', x: -2.5, y: 2, z: 0.3, phase: 0 },
+    { texture: '/textures/about/threejsduzybalon.webp', size: 'large', x: 2.5, y: 2.5, z: 0.2, phase: 1.5 },
+    { texture: '/textures/about/GSAPduzybalon.webp', size: 'large', x: 0, y: 3, z: 0.5, phase: 3 },
 
     // Medium balloons - scattered around
-    { texture: '/textures/about/JSSREDNIBALON.png', size: 'medium', x: -4, y: 1, z: -0.3, phase: 0.8 },
-    { texture: '/textures/about/csssrednibalon.png', size: 'medium', x: 4, y: 1.5, z: -0.2, phase: 2.2 },
-    { texture: '/textures/about/nextjssrednibalon.png', size: 'medium', x: 0, y: 0.5, z: -0.4, phase: 4 },
+    { texture: '/textures/about/JSSREDNIBALON.webp', size: 'medium', x: -4, y: 1, z: -0.3, phase: 0.8 },
+    { texture: '/textures/about/csssrednibalon.webp', size: 'medium', x: 4, y: 1.5, z: -0.2, phase: 2.2 },
+    { texture: '/textures/about/nextjssrednibalon.webp', size: 'medium', x: 0, y: 0.5, z: -0.4, phase: 4 },
 
     // Small balloons - background accents
-    { texture: '/textures/about/htmlmalybalon.png', size: 'small', x: -5.5, y: 2.5, z: -0.8, phase: 1.2 },
-    { texture: '/textures/about/gitmalybalon.png', size: 'small', x: 5.5, y: 3, z: -0.7, phase: 2.8 },
-    { texture: '/textures/about/figmamalybalon.png', size: 'small', x: -3, y: 4.5, z: -0.5, phase: 3.5 },
-    { texture: '/textures/about/firebasemalybalon.png', size: 'small', x: 3.5, y: 4, z: -0.6, phase: 4.5 },
+    { texture: '/textures/about/htmlmalybalon.webp', size: 'small', x: -5.5, y: 2.5, z: -0.8, phase: 1.2 },
+    { texture: '/textures/about/gitmalybalon.webp', size: 'small', x: 5.5, y: 3, z: -0.7, phase: 2.8 },
+    { texture: '/textures/about/figmamalybalon.webp', size: 'small', x: -3, y: 4.5, z: -0.5, phase: 3.5 },
+    { texture: '/textures/about/firebasemalybalon.webp', size: 'small', x: 3.5, y: 4, z: -0.6, phase: 4.5 },
 ];
 
 // Size multipliers for balloon categories
