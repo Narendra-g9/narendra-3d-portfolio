@@ -52,53 +52,6 @@ const GAP = 2.5;
 // 0.2 = 20% crop from the right (corridor side)
 const RIGHT_CROP_AMOUNT = 0.2;
 
-// === LINE SOFTNESS ===
-// Controls how much to soften black outlines on domki & railing textures.
-// 0 = no change (pure black stays black)
-// 80 = black becomes ~31% gray (subtle softening)
-// 128 = black becomes 50% gray (strong softening)
-// 200 = black becomes ~78% gray (very faint lines)
-const LINE_SOFTNESS = 120;
-
-/**
- * Processes a Three.js texture to soften black lines.
- * Remaps pixel brightness: black (0) → gray (minBrightness), white (255) → white (255).
- * Alpha channel is preserved untouched.
- */
-function softenBlackLines(texture, minBrightness) {
-    if (!texture || !texture.image || minBrightness <= 0) return texture;
-
-    const img = texture.image;
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    const range = 255 - minBrightness;
-
-    for (let i = 0; i < data.length; i += 4) {
-        // Remap R, G, B — leave Alpha (i+3) untouched
-        data[i] = minBrightness + (data[i] / 255) * range; // R
-        data[i + 1] = minBrightness + (data[i + 1] / 255) * range; // G
-        data[i + 2] = minBrightness + (data[i + 2] / 255) * range; // B
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-
-    const newTexture = new THREE.CanvasTexture(canvas);
-    // Copy over relevant properties from the original texture
-    newTexture.wrapS = texture.wrapS;
-    newTexture.wrapT = texture.wrapT;
-    newTexture.repeat.copy(texture.repeat);
-    newTexture.offset.copy(texture.offset);
-    newTexture.colorSpace = texture.colorSpace;
-    newTexture.needsUpdate = true;
-    return newTexture;
-}
-
 const GalleryRoom = ({ showRoom, onReady }) => {
     const { openOverlay } = useScene();
     const groupRef = useRef();
@@ -278,14 +231,10 @@ const GalleryRoom = ({ showRoom, onReady }) => {
 
     // --- GEOMETRY & MATERIALS ---
     const floorTexture = useTexture('/textures/gallery/floor.webp');
-    const railingTextureRaw = useTexture('/textures/gallery/railing.webp');
-    const housesTextureRaw = useTexture('/textures/gallery/domki.webp');
+    const railingTexture = useTexture('/textures/gallery/railing.webp');
+    const housesTexture = useTexture('/textures/gallery/domki.webp');
     const cityTexture = useTexture('/textures/gallery/miastotlo.webp');
     const birdTexture = useTexture('/textures/gallery/bird.webp');
-
-    // Soften black outlines on domki & railing
-    const housesTexture = useMemo(() => softenBlackLines(housesTextureRaw, LINE_SOFTNESS), [housesTextureRaw]);
-    const railingTexture = useMemo(() => softenBlackLines(railingTextureRaw, LINE_SOFTNESS), [railingTextureRaw]);
     const clothespinTexture = useTexture('/textures/gallery/klamerka.webp');
 
     useEffect(() => {
