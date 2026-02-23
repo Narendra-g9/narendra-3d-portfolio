@@ -29,7 +29,7 @@ const SegmentDoors = ({
     const doorRightTexture = useTexture('/textures/corridor/doors/dorright.webp');
     const handleLeftTexture = useTexture('/textures/corridor/doors/handle_left_sketch.webp');
     const handleRightTexture = useTexture('/textures/corridor/doors/handle_right_sketch.webp');
-    const doorBackTexture = useTexture('/textures/doors/door_back_left_sketch.webp');
+    const doorBackTexture = useTexture('/textures/corridor/doors/door_back.webp');
     const edgeTexture = useTexture('/textures/corridor/doors/pien.webp');
     const wallTexture = useTexture('/textures/corridor/wall_texture.webp');
 
