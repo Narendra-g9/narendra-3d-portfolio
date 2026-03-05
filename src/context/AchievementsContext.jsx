@@ -73,8 +73,9 @@ export const AchievementsProvider = ({ children }) => {
             gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.15);
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
 
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.5);
+            // Muting sound for now per user request
+            // osc.start(ctx.currentTime);
+            // osc.stop(ctx.currentTime + 0.5);
         } catch (err) {
             console.warn('Failed to play unlock chime', err);
         }

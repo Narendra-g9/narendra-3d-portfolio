@@ -2,6 +2,8 @@ import { useMemo, useState, useRef, useEffect } from 'react';
 import { useTexture, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
+import gsap from 'gsap';
+import '../shaders/RevealMaterial';
 /**
  * CorridorDecorations - Dekoracje korytarza.
  * 
@@ -41,9 +43,13 @@ const PictureContent = ({ imagePath, width, height }) => {
     );
 };
 
-const InspectableFrame = ({ frame, wallX, frameTexture, CABIN_SKETCH_URL, setCameraOverride }) => {
+const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CABIN_SKETCH_URL, setCameraOverride }) => {
     const { camera, viewport } = useThree();
     const groupRef = useRef();
+    const frameMaterialRef = useRef();
+    const framePaintedRef = useRef();
+    const compileFramesRef = useRef(0);
+    const hideDelayRef = useRef();
 
     // Zapisujemy oryginalną pozycję i rotację na ścianie
     const originalPos = useMemo(() => new THREE.Vector3(
@@ -77,8 +83,50 @@ const InspectableFrame = ({ frame, wallX, frameTexture, CABIN_SKETCH_URL, setCam
         else document.body.style.cursor = 'auto';
     }, [isHovered, isMobile]);
 
+    useEffect(() => {
+        if (!frameMaterialRef.current) return;
+
+        const shouldBePainted = isHovered || isInspected;
+
+        if (shouldBePainted) {
+            if (hideDelayRef.current) hideDelayRef.current.kill();
+            if (framePaintedRef.current) framePaintedRef.current.visible = true;
+
+            gsap.to(frameMaterialRef.current, {
+                uProgress: 1.0,
+                duration: 0.8,
+                ease: 'power2.out',
+                overwrite: true
+            });
+        } else {
+            gsap.to(frameMaterialRef.current, {
+                uProgress: 0.0,
+                duration: 0.5,
+                ease: 'power2.out',
+                overwrite: true
+            });
+
+            hideDelayRef.current = gsap.delayedCall(0.55, () => {
+                if (framePaintedRef.current) framePaintedRef.current.visible = false;
+            });
+        }
+
+        return () => {
+            if (hideDelayRef.current) hideDelayRef.current.kill();
+        };
+    }, [isHovered, isInspected]);
+
     useFrame((state, delta) => {
         if (!groupRef.current) return;
+
+        if (compileFramesRef.current < 2) {
+            compileFramesRef.current++;
+            if (compileFramesRef.current === 2) {
+                if (!isHovered && !isInspected && framePaintedRef.current) {
+                    framePaintedRef.current.visible = false;
+                }
+            }
+        }
 
         if (isInspected) {
             // Pozycja przed kamerą (bliżej)
@@ -148,15 +196,29 @@ const InspectableFrame = ({ frame, wallX, frameTexture, CABIN_SKETCH_URL, setCam
                 setIsHovered(false);
             }}
         >
-            {/* RAMKA */}
-            <mesh>
+            {/* RAMKA PAINTED (behind sketch) */}
+            <mesh ref={framePaintedRef} position={[0, 0, -0.001]} scale={[0.98, 0.98, 1]}>
                 <planeGeometry args={[frame.width, frame.height]} />
                 <meshStandardMaterial
+                    map={framePaintedTexture}
+                    transparent={true}
+                    alphaTest={0.5}
+                    side={THREE.DoubleSide}
+                    roughness={0.9}
+                />
+            </mesh>
+
+            {/* RAMKA SKETCH OVERLAY (front) */}
+            <mesh position={[0, 0, 0]}>
+                <planeGeometry args={[frame.width, frame.height]} />
+                <revealMaterial
+                    ref={frameMaterialRef}
                     map={frameTexture}
                     transparent={true}
                     alphaTest={0.1}
                     side={THREE.DoubleSide}
                     roughness={0.9}
+                    uProgress={0.0}
                 />
             </mesh>
 
@@ -199,8 +261,9 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     // =============================================
     // TEKSTURY DEKORACJI
     // =============================================
-    const frameTexture = useTexture('/textures/corridor/ramka na zdjecie.png');
-    const standingFrameTexture = useTexture('/textures/corridor/ramkanazdjecie.png');
+    const frameTexture = useTexture('/textures/corridor/ramkanazdjecieduza.png');
+    const framePaintedTexture = useTexture('/textures/corridor/ramkanazdjecieduza_painted.png');
+    const standingFrameTexture = useTexture('/textures/corridor/ramkanazdjeciemala.png');
     const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.png');
     const grateTexture = useTexture('/textures/corridor/kratkawentylacyjna.png');
     const flowerTexture = useTexture('/textures/corridor/kwiatekwdoniczce.png');
@@ -447,6 +510,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
                     frame={frame}
                     wallX={wallX}
                     frameTexture={frameTexture}
+                    framePaintedTexture={framePaintedTexture}
                     CABIN_SKETCH_URL={CABIN_SKETCH_URL}
                     setCameraOverride={setCameraOverride}
                 />

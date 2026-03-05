@@ -158,6 +158,11 @@ const EntranceDoors = ({
         setTextVisible(true);
         setClipProgress(0);
 
+        if (bugFixedTextRef.current) {
+            bugFixedTextRef.current.position.x = bugClickPos.current.x;
+            bugFixedTextRef.current.position.y = bugClickPos.current.y;
+        }
+
         // Animate clip progress from 0 to 1 (reveals text like pencil drawing)
         gsap.to({ progress: 0 }, {
             progress: 1,
@@ -875,20 +880,19 @@ const EntranceDoors = ({
                     {/* Quote Text */}
                     {/* ROZMIAR TEKSTU: fontSize - mniejsza = mniejszy tekst */}
                     {/* ZAWIJANIE: maxWidth - mniejsza = wcześniejsze zawijanie */}
-                    {isDuckSpeaking && (
-                        <Text
-                            position={[0, 0.1, 0.01]}
-                            fontSize={0.07}
-                            color="#1a1a1a"
-                            anchorX="center"
-                            anchorY="middle"
-                            font={FONT_URL}
-                            maxWidth={1.4}
-                            textAlign="center"
-                        >
-                            {duckQuote}
-                        </Text>
-                    )}
+                    <Text
+                        position={[0, 0.1, 0.01]}
+                        fontSize={0.07}
+                        color="#1a1a1a"
+                        anchorX="center"
+                        anchorY="middle"
+                        font={FONT_URL}
+                        maxWidth={1.4}
+                        textAlign="center"
+                        visible={isDuckSpeaking} // Toggle visibility instead of mounting/unmounting
+                    >
+                        {duckQuote || " "}
+                    </Text>
                 </group>
             </group>
 
@@ -931,15 +935,14 @@ const EntranceDoors = ({
             <Text
                 ref={bugFixedTextRef}
                 position={[2.5, floorY + 2.8, 0.35]} // Default pos, updated on click
-                fontSize={0.18}
+                fontSize={0.25} // Increased size slightly for CabinSketch
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font={FONT_URL}
+                font="/fonts/CabinSketch-Bold.ttf"
                 outlineWidth={0.015}
                 outlineColor="#ffffff"
                 clipRect={[-1, -0.5, -1 + (clipProgress * 2.5), 0.5]}
-                visible={isBugClicked && textVisible} // Toggle visibility only
             >
                 BUG FIXED!
             </Text>
@@ -949,10 +952,10 @@ const EntranceDoors = ({
 
 
             {/* TREE & MOUSE (Left Side) */}
-            <group position={[-2.3, floorY + 2.5, 2.2]}>
+            <group position={[-2.9, floorY + 2.7, 1]}>
                 {/* Tree */}
                 <mesh position={[0, 0, 0]}>
-                    <planeGeometry args={[4, 5.5]} />
+                    <planeGeometry args={[6, 8]} />
                     <meshStandardMaterial
                         map={treeTexture}
                         transparent={true}
@@ -969,7 +972,7 @@ const EntranceDoors = ({
                 <group ref={mousePivotRef} position={[0.341, 0.02 - 0.456, 0]}>
                     {/* Mesh moves opposite to pivot offset to keep visual position */}
                     <mesh position={[-0.351, 0.456, 0]}>
-                        <planeGeometry args={[4, 5.5]} />
+                        <planeGeometry args={[6, 8]} />
                         <meshStandardMaterial
                             map={mouseTexture}
                             transparent={true}
