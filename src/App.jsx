@@ -113,7 +113,7 @@ function AppContent() {
               />
 
               {/* Advanced FPS & Performance Monitor */}
-              <Perf position="top-left" minimal={false} />
+              {/* <Perf position="top-left" minimal={false} /> */}
 
               <Suspense fallback={null}>
                 <Experience

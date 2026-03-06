@@ -82,7 +82,13 @@ const PHASE = {
 const ContactRoom = ({ showRoom, onReady, isExiting }) => {
     const { camera } = useThree();
     const { isTeleporting } = useScene();
-    const { showTutorial, unlockAchievement } = useAchievements();
+    const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
+
+    useEffect(() => {
+        if (isExiting || isTeleporting) {
+            hidePopup();
+        }
+    }, [isExiting, isTeleporting, hidePopup]);
 
     // Load Sea Texture
     const seaTexture = useTexture("/textures/contact/faletopdown.webp");

@@ -23,7 +23,7 @@ const VERTICAL_SPACING = 2.5; // Space between monitor rings
 const TOWER_Y_START = -5; // Starting Y offset for tower (negative = lower) -> CONTROLS HEIGHT (UP/DOWN)
 const TOWER_Z_START = -10; // Starting Z position (negative = further away) -> CONTROLS DISTANCE
 
-const StudioRoom = ({ showRoom, onReady }) => {
+const StudioRoom = ({ showRoom, onReady, isExiting }) => {
     const groupRef = useRef();
     const towerRef = useRef();
     const { camera, size } = useThree();
@@ -73,10 +73,16 @@ const StudioRoom = ({ showRoom, onReady }) => {
     const [isAnimating, setIsAnimating] = useState(false);
 
     // Global Scene Context for Overlay
-    const { openOverlay, overlayContent } = useScene();
+    const { openOverlay, overlayContent, isTeleporting } = useScene();
 
     // Achievements Context
-    const { showTutorial, unlockAchievement } = useAchievements();
+    const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
+
+    useEffect(() => {
+        if (isExiting || isTeleporting) {
+            hidePopup();
+        }
+    }, [isExiting, isTeleporting, hidePopup]);
 
     const latestContent = getLatestContent();
 

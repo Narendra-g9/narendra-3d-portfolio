@@ -27,19 +27,70 @@ const tempQuat = new THREE.Quaternion();
 
 const CABIN_SKETCH_URL = '/fonts/CabinSketch-Regular.ttf';
 
-const PictureContent = ({ imagePath, width, height }) => {
+const PictureContent = ({ imagePath, imagePaintedPath, width, height, isPainted }) => {
     const texture = useTexture(imagePath);
+    // Render nothing if no painted path, but we still call the hook unconditionally to respect hook rules
+    const paintedTexture = useTexture(imagePaintedPath || imagePath);
+
+    const materialRef = useRef();
+
+    useEffect(() => {
+        if (!materialRef.current || !imagePaintedPath) return;
+
+        if (isPainted) {
+            gsap.to(materialRef.current, {
+                uProgress: 1.0,
+                duration: 0.8,
+                ease: 'power2.out',
+                overwrite: true
+            });
+        } else {
+            gsap.to(materialRef.current, {
+                uProgress: 0.0,
+                duration: 0.5,
+                ease: 'power2.out',
+                overwrite: true
+            });
+        }
+    }, [isPainted, imagePaintedPath]);
+
     return (
-        <mesh position={[0, 0, 0.01]}> {/* Lekko przed ramką */}
-            <planeGeometry args={[width, height]} />
-            <meshStandardMaterial
-                map={texture}
-                transparent={true}
-                alphaTest={0.1} // KLUCZOWE: Naprawia przezroczystość (wycina tło)
-                side={THREE.DoubleSide}
-                roughness={0.5}
-            />
-        </mesh>
+        <group position={[0, 0, 0.01]}> {/* Lekko przed ramką */}
+            {imagePaintedPath && (
+                <mesh position={[0, 0, -0.001]}>
+                    <planeGeometry args={[width, height]} />
+                    <meshStandardMaterial
+                        map={paintedTexture}
+                        transparent={true}
+                        alphaTest={0.5}
+                        side={THREE.DoubleSide}
+                        roughness={0.9}
+                    />
+                </mesh>
+            )}
+            <mesh position={[0, 0, 0]}>
+                <planeGeometry args={[width, height]} />
+                {imagePaintedPath ? (
+                    <revealMaterial
+                        ref={materialRef}
+                        map={texture}
+                        transparent={true}
+                        alphaTest={0.1}
+                        side={THREE.DoubleSide}
+                        roughness={0.9}
+                        uProgress={0.0}
+                    />
+                ) : (
+                    <meshStandardMaterial
+                        map={texture}
+                        transparent={true}
+                        alphaTest={0.1} // KLUCZOWE: Naprawia przezroczystość (wycina tło)
+                        side={THREE.DoubleSide}
+                        roughness={0.5}
+                    />
+                )}
+            </mesh>
+        </group>
     );
 };
 
@@ -226,8 +277,10 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
             {frame.image && (
                 <PictureContent
                     imagePath={frame.image}
+                    imagePaintedPath={frame.imagePainted}
                     width={frame.imageWidth || frame.width * 0.7}
                     height={frame.imageHeight || frame.height * 0.7}
+                    isPainted={isHovered || isInspected}
                 />
             )}
 
@@ -266,7 +319,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     const standingFrameTexture = useTexture('/textures/corridor/ramkanazdjeciemala.png');
     const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.png');
     const grateTexture = useTexture('/textures/corridor/kratkawentylacyjna.png');
-    const flowerTexture = useTexture('/textures/corridor/kwiatekwdoniczce.png');
+    const shakerTexture = useTexture('/textures/corridor/shakerholy.png');
 
     // --- Ceiling Lights (punkty światła) ---
     // Tekstury lamp
@@ -336,6 +389,11 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 1.5,
             y: 0.2,
             id: 'frame-2',
+            image: '/textures/corridor/rysuneknaobrazek2.png',
+            imagePainted: '/textures/corridor/rysuneknaobrazek2_painted.png',
+            imageWidth: 2.03,      // TUTAJ ZMIENIASZ SZEROKOŚĆ OBRAZKA W RAMCE
+            imageHeight: 1.03,     // TUTAJ ZMIENIASZ WYSOKOŚĆ OBRAZKA W RAMCE
+            offsetFromWall: 0.1
         },
         {
             z: zOffset - 40,         // Między Studio a About (relZ -34 do -46)
@@ -479,14 +537,14 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
                     <meshStandardMaterial attach="material-5" map={woodTexture} /> {/* Back */}
                 </mesh>
 
-                {/* KWIATEK W DONICZCE NA STOLE */}
+                {/* SHAKER HOLY NA STOLE */}
                 <mesh
-                    position={[0, tableConfig.height + tableConfig.topThickness + 0.2, 0]} // Na blacie
+                    position={[0, tableConfig.height + tableConfig.topThickness + 0.25, 0]} // Na blacie
                     rotation={[0, -Math.PI / 4, 0]} // Lekki obrót
                 >
-                    <planeGeometry args={[0.3, 0.4]} />
+                    <planeGeometry args={[0.3, 0.5]} />
                     <meshStandardMaterial
-                        map={flowerTexture}
+                        map={shakerTexture}
                         transparent={true}
                         alphaTest={0.1}
                         side={THREE.DoubleSide}

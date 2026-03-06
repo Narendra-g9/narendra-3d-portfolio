@@ -23,13 +23,19 @@ const STORY_MILESTONES = [
 const AboutRoom = ({ showRoom, onReady, isExiting }) => {
     const { camera } = useThree();
     const { isTeleporting, overlayContent } = useScene();
-    const { showTutorial, unlockAchievement } = useAchievements();
+    const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
 
     // Use ref to track overlay state for event listeners (avoids stale closures)
     const overlayRef = useRef(overlayContent);
     useEffect(() => {
         overlayRef.current = overlayContent;
     }, [overlayContent]);
+
+    useEffect(() => {
+        if (isExiting || isTeleporting) {
+            hidePopup();
+        }
+    }, [isExiting, isTeleporting, hidePopup]);
 
     // Track if we've signaled ready
     const hasSignaledReady = useRef(false);

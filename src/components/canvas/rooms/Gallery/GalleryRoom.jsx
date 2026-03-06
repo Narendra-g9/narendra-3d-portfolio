@@ -61,9 +61,9 @@ const BIRD_HEIGHT = 0.35; // Mniejsze = bardziej "spłaszczony" / rozciągnięty
 // 0.2 = 20% crop from the right (corridor side)
 const RIGHT_CROP_AMOUNT = 0.2;
 
-const GalleryRoom = ({ showRoom, onReady }) => {
-    const { openOverlay } = useScene();
-    const { showTutorial, unlockAchievement } = useAchievements();
+const GalleryRoom = ({ showRoom, onReady, isExiting }) => {
+    const { openOverlay, isTeleporting } = useScene();
+    const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
     const groupRef = useRef();
     const [scrollOffset, setScrollOffset] = useState(0);
     const targetScroll = useRef(0);
@@ -71,6 +71,12 @@ const GalleryRoom = ({ showRoom, onReady }) => {
     const [selectedCard, setSelectedCard] = useState(null);
     const [globalIsAnimating, setGlobalIsAnimating] = useState(false);
     const cardRefs = useRef([]);
+
+    useEffect(() => {
+        if (isExiting || isTeleporting) {
+            hidePopup();
+        }
+    }, [isExiting, isTeleporting, hidePopup]);
 
     const handleCardClick = async (clickedIndex) => {
         if (globalIsAnimating) return;
