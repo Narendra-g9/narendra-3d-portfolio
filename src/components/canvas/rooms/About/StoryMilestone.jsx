@@ -3,6 +3,9 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
+// Reusable Vector3 to avoid allocations in useFrame
+const _worldPos = new THREE.Vector3();
+
 /**
  * StoryMilestone Component
  * 
@@ -39,13 +42,12 @@ const StoryMilestone = ({
     useFrame((state, delta) => {
         if (!groupRef.current) return;
 
-        // Get world position of milestone
-        const worldPos = new THREE.Vector3();
-        groupRef.current.getWorldPosition(worldPos);
+        // Get world position of milestone (reuse vector to avoid GC pressure)
+        groupRef.current.getWorldPosition(_worldPos);
 
         // Objects move TOWARDS camera (camera is at z ~ 0)
         // worldPos.z goes from very negative (far) to positive (passed camera)
-        const z = worldPos.z;
+        const z = _worldPos.z;
 
         // Calculate target opacity based on Z position
         let targetOpacity = 0;

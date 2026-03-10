@@ -5,6 +5,9 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import '../../shaders/RevealMaterial';
 
+// Reusable Vector3 to avoid allocations in useFrame
+const _tempScale = new THREE.Vector3();
+
 const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onClick, scale = [2.3, 2.3] }) => {
     const meshRef = useRef();
     const materialRef = useRef();
@@ -39,7 +42,7 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
             // Hover scale
             const targetScale = hovered ? 1.1 : 1;
             // Apply base scale * hover factor
-            meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, 1), 0.1);
+            meshRef.current.scale.lerp(_tempScale.set(targetScale, targetScale, 1), 0.1);
         }
     });
 

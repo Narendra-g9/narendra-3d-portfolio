@@ -7,6 +7,9 @@ import SkyChunk, { CHUNK_LENGTH, ROOM_Z } from './SkyChunk';
 import { useScene } from '../../../../context/SceneContext';
 import '../../shaders/RevealBasicMaterial'; // Registers brush-stroke reveal for BasicMaterial
 
+// Reusable Vector3 to avoid allocations in event handlers
+const _tempVec3 = new THREE.Vector3();
+
 /**
  * InfiniteSkyManager Component
  * 
@@ -991,7 +994,7 @@ const SIZE_MULTIPLIERS = {
 };
 
 // Individual balloon component
-const SkillBalloon = ({ config, revealFactor, spreadFactor, time }) => {
+const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => {
     const { viewport } = useThree();
     const isMobileViewport = viewport.width < 8; // Local const for texture loading before state
     const texture = useLoader(THREE.TextureLoader, config.texture);
@@ -1030,6 +1033,7 @@ const SkillBalloon = ({ config, revealFactor, spreadFactor, time }) => {
     const baseHeight = SIZE_MULTIPLIERS[config.size];
 
     const outerGroupRef = useRef();
+    const innerGroupRef = useRef();
     const targetScale = useRef(1.0);
     const currentScale = useRef(1.0);
     const targetMagnet = useRef({ x: 0, y: 0 });
@@ -1173,53 +1177,67 @@ const SkillBalloon = ({ config, revealFactor, spreadFactor, time }) => {
         }
     });
 
-    // Floating animation with unique phase
-    const floatY = Math.sin(time * 0.6 + config.phase) * 0.3;
-    const floatX = Math.sin(time * 0.4 + config.phase * 0.7) * 0.15;
-    const rotation = Math.sin(time * 0.3 + config.phase) * 0.08;
-
-    // Reveal: balloons float up from below, including respawn offset
-    const startY = config.y - 8;
-    const endY = config.y;
-    const currentY = startY + revealFactor * (endY - startY) + floatY + respawnOffsetRef.current;
-
-    // Scale up as they reveal
-    let scale = revealFactor * sizeScale;
-
-    // Apply expanding pop effect and smooth hover scale
-    const popScaleEffect = currentScale.current + popRef.current * 0.4;
-    scale *= popScaleEffect;
-
-    // === SPREAD EFFECT (ROZSUWANIE) ===
-    // Wszystkie balony rozsuwają się na boki
-    const maxSpread = 15 * spreadScale; // Mniejszy spread na mobile
-
-    let spreadX = 0;
-
-    if (config.x < -0.5) {
-        // Lewa strona → idzie w lewo
-        spreadX = -spreadFactor * maxSpread * (0.5 + Math.abs(config.x) / 6);
-    } else if (config.x > 0.5) {
-        // Prawa strona → idzie w prawo
-        spreadX = spreadFactor * maxSpread * (0.5 + Math.abs(config.x) / 6);
-    } else {
-        // Środkowe balony (x blisko 0) → rozsuń na podstawie phase
-        spreadX = config.phase > 3.5
-            ? spreadFactor * maxSpread * 0.8  // w prawo (Next.js)
-            : -spreadFactor * maxSpread * 0.8; // w lewo (GSAP)
-    }
+    // Floating animation with unique phase — now computed inside useFrame
+    // Moved from render body to avoid re-renders
 
     // Bazowa pozycja X (skalowana na mobile)
     const baseX = config.x * positionScale;
 
+    // P2: Compute position/scale/rotation imperatively inside useFrame
+    useFrame(() => {
+        if (!outerGroupRef.current) return;
+
+        const time = timeRef.current;
+        const revealFactor = revealFactorRef.current;
+        const spreadFactor = spreadFactorRef.current;
+
+        // Floating animation with unique phase
+        const floatY = Math.sin(time * 0.6 + config.phase) * 0.3;
+        const floatX = Math.sin(time * 0.4 + config.phase * 0.7) * 0.15;
+        const rotation = Math.sin(time * 0.3 + config.phase) * 0.08;
+
+        // Reveal: balloons float up from below, including respawn offset
+        const startY = config.y - 8;
+        const endY = config.y;
+        const currentY = startY + revealFactor * (endY - startY) + floatY + respawnOffsetRef.current;
+
+        // Scale up as they reveal
+        let scale = revealFactor * sizeScale;
+        const popScaleEffect = currentScale.current + popRef.current * 0.4;
+        scale *= popScaleEffect;
+
+        // === SPREAD EFFECT (ROZSUWANIE) ===
+        const maxSpread = 15 * spreadScale;
+        let spreadX = 0;
+
+        if (config.x < -0.5) {
+            spreadX = -spreadFactor * maxSpread * (0.5 + Math.abs(config.x) / 6);
+        } else if (config.x > 0.5) {
+            spreadX = spreadFactor * maxSpread * (0.5 + Math.abs(config.x) / 6);
+        } else {
+            spreadX = config.phase > 3.5
+                ? spreadFactor * maxSpread * 0.8
+                : -spreadFactor * maxSpread * 0.8;
+        }
+
+        // Apply imperatively
+        outerGroupRef.current.position.set(baseX + floatX + spreadX, currentY, config.z);
+        outerGroupRef.current.rotation.z = rotation;
+        const s = Math.max(0.001, scale); // Avoid zero scale
+        outerGroupRef.current.scale.set(s, s, s);
+
+        // Update magnet position on inner group imperatively
+        if (innerGroupRef.current) {
+            innerGroupRef.current.position.set(currentMagnet.current.x, currentMagnet.current.y, 0);
+        }
+    });
+
     return (
         <group
             ref={outerGroupRef}
-            position={[baseX + floatX + spreadX, currentY, config.z]}
-            rotation={[0, 0, rotation]}
-            scale={scale}
+            position={[baseX, config.y - 8, config.z]}
         >
-            <group position={[currentMagnet.current.x, currentMagnet.current.y, 0]}>
+            <group ref={innerGroupRef}>
                 {/* Painted balloon (behind) - hidden until hover */}
                 <mesh ref={paintedMeshRef} visible={true}>
                     <planeGeometry args={[baseHeight * aspect, baseHeight]} />
@@ -1248,11 +1266,10 @@ const SkillBalloon = ({ config, revealFactor, spreadFactor, time }) => {
                     onPointerOut={handlePointerOut}
                     onPointerMove={(e) => {
                         if (hovered && !isPopping && outerGroupRef.current) {
-                            const vec = new THREE.Vector3();
-                            outerGroupRef.current.getWorldPosition(vec);
+                            outerGroupRef.current.getWorldPosition(_tempVec3);
                             // Reduced magnetic pull from 0.5 to 0.15 for gentler effect
-                            targetMagnet.current.x = (e.point.x - vec.x) * 0.15;
-                            targetMagnet.current.y = (e.point.y - vec.y) * 0.15;
+                            targetMagnet.current.x = (e.point.x - _tempVec3.x) * 0.15;
+                            targetMagnet.current.y = (e.point.y - _tempVec3.y) * 0.15;
                         }
                     }}
                     visible={popRef.current < 0.99}
@@ -1304,9 +1321,10 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
     const { camera, viewport } = useThree();
     const isMobile = viewport.width < 8;
     const groupRef = useRef();
-    const [revealFactor, setRevealFactor] = useState(0);
-    const [spreadFactor, setSpreadFactor] = useState(0);
-    const [time, setTime] = useState(0);
+    // P2: Use refs instead of state to avoid 60 re-renders/sec inside useFrame
+    const revealFactorRef = useRef(0);
+    const spreadFactorRef = useRef(0);
+    const timeRef = useRef(0);
 
     useFrame((state) => {
         if (!groupRef.current) return;
@@ -1317,7 +1335,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
         groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
         if (!groupRef.current.visible) return;
 
-        setTime(state.clock.elapsedTime);
+        timeRef.current = state.clock.elapsedTime;
 
         // FIX: Use consistent distance based on scrollProgress + offset
         const distanceZ = z + scrollProgress - 55;
@@ -1336,7 +1354,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
             newRevealFactor = 1;
         }
 
-        setRevealFactor(newRevealFactor);
+        revealFactorRef.current = newRevealFactor;
 
         // === SPREAD EFFECT (EDYTUJ TUTAJ SKILLS SPREAD) ===
         // Im bliżej kamery, tym bardziej balony się rozsuwają
@@ -1353,7 +1371,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
             newSpreadFactor = 1;
         }
 
-        setSpreadFactor(newSpreadFactor);
+        spreadFactorRef.current = newSpreadFactor;
     });
 
     return (
@@ -1387,9 +1405,9 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
                 <SkillBalloon
                     key={index}
                     config={config}
-                    revealFactor={revealFactor}
-                    spreadFactor={spreadFactor}
-                    time={time}
+                    revealFactorRef={revealFactorRef}
+                    spreadFactorRef={spreadFactorRef}
+                    timeRef={timeRef}
                 />
             ))}
         </group>

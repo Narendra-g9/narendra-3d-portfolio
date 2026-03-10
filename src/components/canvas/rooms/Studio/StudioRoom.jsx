@@ -46,7 +46,6 @@ const StudioRoom = ({ showRoom, onReady, isExiting }) => {
         const isMobile = size.width < 768; // Standard mobile breakpoint
         const isTablet = size.width < 1024 && size.width >= 768;
 
-        console.log('Screen px width:', size.width, 'isMobile:', isMobile, 'isTablet:', isTablet);
 
         return {
             zoomDistance: isMobile ? 2 : isTablet ? 3 : CAMERA_ZOOM_DISTANCE,
@@ -335,13 +334,6 @@ const StudioRoom = ({ showRoom, onReady, isExiting }) => {
         // Final target = current + shortest delta
         const finalRotation = towerRef.current.rotation.y + delta;
 
-        console.log('Rotating tower:', {
-            monitorRot: item.rot,
-            currentRotation: towerRef.current.rotation.y,
-            targetRotation,
-            delta,
-            finalRotation
-        });
 
         // STEP 1: Animate tower rotation
         gsap.to(towerRef.current.rotation, {
@@ -386,10 +378,6 @@ const StudioRoom = ({ showRoom, onReady, isExiting }) => {
                 const targetZ = camera.position.z + forward.z * zoomDist + right.z * panRight;
                 const targetY = monitorWorldY - panDown; // Pan down moves camera down = monitor at top
 
-                console.log('Moving camera:', {
-                    zoomDist, panRight, panDown,
-                    targetPos: { x: targetX, y: targetY, z: targetZ }
-                });
 
                 gsap.to(camera.position, {
                     x: targetX,

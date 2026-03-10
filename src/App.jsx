@@ -1,7 +1,6 @@
 import { useState, Suspense, useEffect, useCallback, useLayoutEffect, lazy } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Preload, useTexture, Text, PerformanceMonitor } from '@react-three/drei';
-import { Perf } from 'r3f-perf';
 import * as THREE from 'three';
 
 import Preloader from './components/dom/Preloader';
@@ -12,6 +11,7 @@ import { PerformanceProvider, usePerformance } from './context/PerformanceContex
 import { SceneProvider } from './context/SceneContext';
 import NavigationUI from './components/ui/NavigationUI';
 import GlobalOverlay from './components/ui/GlobalOverlay';
+import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import posthog from 'posthog-js';
 
 // Initialize PostHog
@@ -139,6 +139,7 @@ function AppContent() {
               <NavigationUI />
               <GlobalOverlay />
               <PaperTransition />
+              <ScreenReaderOverlay />
             </>
           )}
 

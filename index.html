@@ -1,10 +1,52 @@
 <!doctype html>
-<html lang="en">
+<html lang="pl">
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="/favico.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO Meta Tags -->
+  <title>ITom Portfolio — Interactive 3D Developer Portfolio</title>
+  <meta name="description" content="Explore ITom's creative portfolio — an immersive 3D experience built with React, Three.js, and GSAP. Browse projects, discover skills, and connect through an interactive corridor of hand-drawn rooms." />
+  <meta name="author" content="ITom" />
+  <meta name="keywords" content="portfolio, web developer, frontend, React, Three.js, 3D, interactive, creative, GSAP, ITom" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://portfolio-itom.pages.dev/" />
+
+  <!-- Open Graph (Facebook, LinkedIn, Discord) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ITom Portfolio — Interactive 3D Developer Portfolio" />
+  <meta property="og:description" content="Explore ITom's creative portfolio — an immersive 3D experience built with React, Three.js, and GSAP. Browse projects, discover skills, and connect." />
+  <meta property="og:url" content="https://portfolio-itom.pages.dev/" />
+  <meta property="og:site_name" content="ITom Portfolio" />
+  <meta property="og:image" content="https://portfolio-itom.pages.dev/og-image.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="pl_PL" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ITom Portfolio — Interactive 3D Developer Portfolio" />
+  <meta name="twitter:description" content="Explore ITom's creative portfolio — an immersive 3D experience built with React, Three.js, and GSAP." />
+  <meta name="twitter:image" content="https://portfolio-itom.pages.dev/og-image.webp" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "ITom",
+      "url": "https://portfolio-itom.pages.dev",
+      "jobTitle": "Frontend Developer",
+      "knowsAbout": ["React", "Three.js", "JavaScript", "TypeScript", "GSAP", "Next.js", "Web Development"],
+      "sameAs": [
+        "https://www.linkedin.com/in/tomasz-szmajda-259337305/",
+        "https://github.com/ITomPoland",
+        "https://www.instagram.com/itom.dev/"
+      ]
+    }
+  </script>
 
   <!-- Google Fonts: Hand-drawn + Primary -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,11 +57,26 @@
 
   <!-- Preload bazowych tekstur używanych w preloaderze -->
   <link rel="preload" as="image" href="/textures/paper-texture.webp" type="image/webp" crossorigin="anonymous">
-
-  <title>ITom Portfolio</title>
 </head>
 
 <body>
+  <!-- Noscript fallback for SEO crawlers -->
+  <noscript>
+    <div style="padding: 40px; font-family: Inter, sans-serif; max-width: 800px; margin: 0 auto;">
+      <h1>ITom — Frontend Developer Portfolio</h1>
+      <p>This is an interactive 3D portfolio built with React and Three.js. Please enable JavaScript to experience it.</p>
+      <h2>Rooms</h2>
+      <ul>
+        <li><strong>About</strong> — My personal story, awards, journey milestones, and technology skills</li>
+        <li><strong>The Gallery</strong> — Portfolio of web development projects</li>
+        <li><strong>Contact</strong> — Social media links and contact form</li>
+        <li><strong>The Studio</strong> — Detailed experience and work history</li>
+      </ul>
+      <h2>Technologies</h2>
+      <p>React, Three.js, Next.js, TypeScript, GSAP, Figma, Firebase, and more.</p>
+    </div>
+  </noscript>
+
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

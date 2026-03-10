@@ -148,9 +148,10 @@
 - [X] **A4 — Focus Trap w mapie:** ~~Auto-focus na close button po otwarciu + obsługa `Escape` + focus trap (Tab wraca do pierwszego elementu).~~ ✅ DONE
 - [X] **A5 — Aria labels na suwakach:** ~~Dodać `aria-label` i `aria-valuetext` do suwaków Music/SFX.~~ ✅ DONE
 - [X] **A6 — Map hover zones jako `<button>`:** ~~Zamienić `<div>` hover zones na `<button>` z `aria-label` i `onFocus/onBlur` w `NavigationUI.jsx`.~~ ✅ DONE
-- [ ] **A7 — SR fallback dla Canvas:** Stworzyć niewidoczną warstwę HTML z przyciskami odpowiadającymi interaktywnym elementom 3D (drzwi, monitory, beczki).
+- [X] **A7 — SR fallback dla Canvas:** ~~Stworzyć niewidoczną warstwę HTML z przyciskami odpowiadającymi interaktywnym elementom 3D.~~ ✅ DONE
 - [ ] **Responsywność (Mobile):** Poprawić FOV/pozycję Z kamery na małych ekranach, viewport ucina sceny.
 - [ ] **Optymalizacja ładowania:** Dodać wizualny feedback po kliknięciu drzwi (spinner) + preload tekstur najbliższych pokojów.
+- [X] **SEO Meta Tags:** ~~Dodać title, description, OG, Twitter Card, JSON-LD, canonical, noscript fallback.~~ ✅ DONE
 - [ ] **Meta tagi i OG image:** Dodać `<meta description>`, Open Graph tags, Twitter Card do `index.html`.
 - [ ] Preloader pokaże % ładowania assetów (jest `Preloader.jsx`, może wymaga update)
 
@@ -161,12 +162,11 @@
 - [ ] Dodać subtelne particle effects (pyłki w korytarzu? Świetliki w About?)
 
 ### 14. Jakość kodu i Performance
-- [ ] **P1 — `new THREE.Vector3()` w useFrame:** 6 miejsc tworzących nowe instancje co klatkę → przenieść do `useRef` lub stałych modułowych.
-  - `StoryMilestone.jsx:43`, `SocialBarrel.jsx:42`, `GalleryRoom.jsx:901`, `InfiniteSkyManager.jsx:1251`
-- [ ] **P2 — `setState` w useFrame (SkillsMilestone):** `setRevealFactor/setSpreadFactor/setTime` co klatkę → zamienić na `useRef`.
-- [ ] **P3 — `console.log` w produkcji:** `StudioRoom.jsx:49,338` → usunąć lub zawinąć w `if (import.meta.env.DEV)`.
-- [ ] **P4 — Martwy hook `useCorridorCamera`:** Nie jest nigdzie importowany → potwierdzić i usunąć.
-- [ ] **P5 — Import `r3f-perf` w produkcji:** `App.jsx:4` → import dodaje kod do bundla mimo zakomentowanego `<Perf>`.
+- [X] **P1 — `new THREE.Vector3()` w useFrame:** ~~Przenieść do stałych modułowych.~~ ✅ DONE (4 pliki)
+- [X] **P2 — `setState` w useFrame (SkillsMilestone):** ~~Zamienić na `useRef` + imperatywne update.~~ ✅ DONE
+- [X] **P3 — `console.log` w produkcji:** ~~`StudioRoom.jsx:49,338,389` usunięte.~~ ✅ DONE
+- [X] **P4 — Martwy hook `useCorridorCamera`:** ~~Nie jest nigdzie importowany → usunięty.~~ ✅ DONE
+- [X] **P5 — Import `r3f-perf` w produkcji:** ~~`App.jsx:4` → import usunięty.~~ ✅ DONE
 
 ---
 
