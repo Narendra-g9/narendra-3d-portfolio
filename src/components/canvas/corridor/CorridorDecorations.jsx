@@ -327,20 +327,20 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     // =============================================
     // TEKSTURY DEKORACJI
     // =============================================
-    const frameTexture = useTexture('/textures/corridor/ramkanazdjecieduza.png');
-    const framePaintedTexture = useTexture('/textures/corridor/ramkanazdjecieduza_painted.png');
-    const standingFrameTexture = useTexture('/textures/corridor/ramkanazdjeciemala.png');
-    const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.png');
-    const grateTexture = useTexture('/textures/corridor/kratkawentylacyjna.png');
-    const shakerTexture = useTexture('/textures/corridor/shakerholy.png');
+    const frameTexture = useTexture('/textures/corridor/ramkanazdjecieduza.webp');
+    const framePaintedTexture = useTexture('/textures/corridor/ramkanazdjecieduza_painted.webp');
+    const standingFrameTexture = useTexture('/textures/corridor/ramkanazdjeciemala.webp');
+    const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.webp');
+    const grateTexture = useTexture('/textures/corridor/kratkawentylacyjna.webp');
+    const shakerTexture = useTexture('/textures/corridor/shakerholy.webp');
 
     // --- Ceiling Lights (punkty światła) ---
     // Tekstury lamp
-    const lampGrilleTexture = useTexture('/textures/corridor/kratanalampy.png');
+    const lampGrilleTexture = useTexture('/textures/corridor/kratanalampy.webp');
     // lampGrilleTexture.wrapS = lampGrilleTexture.wrapT = THREE.RepeatWrapping; 
     // lampGrilleTexture.repeat.set(1, 1);
 
-    const lampSideTexture = useTexture('/textures/corridor/bokilampy.png');
+    const lampSideTexture = useTexture('/textures/corridor/bokilampy.webp');
     lampSideTexture.wrapS = lampSideTexture.wrapT = THREE.RepeatWrapping;
     // Dopasowanie UV dla długiego boku
     lampSideTexture.repeat.set(1, 1);
@@ -380,7 +380,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             y: 0.3,                  // Wysokość na ścianie
             id: 'frame-1',
             // Custom setup for "rysuneknaobraz1.png"
-            image: '/textures/corridor/rysuneknaobraz1.png',
+            image: '/textures/corridor/rysuneknaobraz1.webp',
             imageWidth: 1.1,
             imageHeight: 1.1,
             offsetFromWall: 0.1, // Przesunięcie bliżej środka korytarza (0.1 unit)
@@ -402,8 +402,8 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
             height: 1.5,
             y: 0.2,
             id: 'frame-2',
-            image: '/textures/corridor/rysuneknaobrazek2.png',
-            imagePainted: '/textures/corridor/rysuneknaobrazek2_painted.png',
+            image: '/textures/corridor/rysuneknaobrazek2.webp',
+            imagePainted: '/textures/corridor/rysuneknaobrazek2_painted.webp',
             imageWidth: 2.03,      // TUTAJ ZMIENIASZ SZEROKOŚĆ OBRAZKA W RAMCE
             imageHeight: 1.03,     // TUTAJ ZMIENIASZ WYSOKOŚĆ OBRAZKA W RAMCE
             offsetFromWall: 0.1
@@ -429,12 +429,12 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     // =============================================
     // STOLIK (TABLE)
     // =============================================
-    const woodTexture = useTexture('/textures/corridor/texturadrewnadonozekbiurka.png');
-    const tableTopTexture = useTexture('/textures/corridor/gorastolika.png');
+    const woodTexture = useTexture('/textures/corridor/texturadrewnadonozekbiurka.webp');
+    const tableTopTexture = useTexture('/textures/corridor/gorastolika.webp');
 
     // Tekstury szafki
-    const cabinetFrontTexture = useTexture('/textures/corridor/szafkaprzod.png');
-    const cabinetRestTexture = useTexture('/textures/corridor/szafkaprzodgora.png');
+    const cabinetFrontTexture = useTexture('/textures/corridor/szafkaprzod.webp');
+    const cabinetRestTexture = useTexture('/textures/corridor/szafkaprzodgora.webp');
 
     // Klonujemy teksturę dla nóg, żeby ją obrócić (bo user mówi że jest poziomo a ma być pionowo)
     const legTexture = useMemo(() => {

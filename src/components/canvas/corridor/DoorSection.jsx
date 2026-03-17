@@ -220,10 +220,10 @@ const DoorSection = ({
     const handleTexture = useTexture('/textures/corridor/doors/klamkadodrzwi.webp');
     const handlePaintedTexture = useTexture(isTouch ? dummyTex : '/textures/corridor/doors/klamkadodrzwi_painted.webp');
     const doorBackTexture = useTexture('/textures/corridor/doors/backsingledoors.webp');
-    const arrowTexture = useTexture('/textures/corridor/strzalka.png');
+    const arrowTexture = useTexture('/textures/corridor/strzalka.webp');
 
     // Baseboard texture for door sections (1582x94 px, aspect 16.83:1)
-    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.png');
+    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.webp');
     baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
     baseboardTexture.colorSpace = THREE.SRGBColorSpace;
 
@@ -927,7 +927,7 @@ const DoorSection = ({
     const handlePivotX = side === 'left' ? doorWidth * 0.25 : -doorWidth * 0.25;
 
     // Sign texture mapping - now uses a single empty sign texture
-    const signTextureUrl = '/textures/corridor/pustatabliczka.png';
+    const signTextureUrl = '/textures/corridor/pustatabliczka.webp';
     const signTexture = useTexture(signTextureUrl);
 
     return (

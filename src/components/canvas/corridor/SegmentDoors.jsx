@@ -53,7 +53,7 @@ const SegmentDoors = ({
     wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
 
     // Baseboard texture (1582x94 px)
-    const baseboardTexSrc = useTexture('/textures/corridor/texturadoprogow.png');
+    const baseboardTexSrc = useTexture('/textures/corridor/texturadoprogow.webp');
     const NATURAL_TILE_W = (1582 / 94) * 0.15; // ~2.524 units per natural tile
 
     // --- Dimensions from EntranceDoors ---

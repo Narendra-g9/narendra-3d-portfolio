@@ -82,12 +82,12 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
     // USTAWIENIA PODŁOGI (FLOOR SETTINGS)
     // =============================================
     // Tekstura kawałka podłogi - ręcznie rysowane deski
-    const floorTexture = useTexture('/textures/corridor/kawalekpodlogi.png');
+    const floorTexture = useTexture('/textures/corridor/kawalekpodlogi.webp');
     floorTexture.wrapS = floorTexture.wrapT = THREE.ClampToEdgeWrapping;
 
     // Tekstura listwy przypodłogowej (baseboards)
     // Wymiary obrazka: 1582 x 94 px → aspect ratio 16.83:1
-    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.png');
+    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.webp');
     baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
     baseboardTexture.colorSpace = THREE.SRGBColorSpace;
 

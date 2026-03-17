@@ -1,5 +1,5 @@
 import { useState, Suspense, useEffect, useCallback, useLayoutEffect, lazy } from 'react';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
 import { Preload, useTexture, Text, PerformanceMonitor } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -26,10 +26,12 @@ const Experience = lazy(() => import('./components/canvas/Experience'));
 import './styles/main.scss';
 
 // --- BATCH ASSET PRELOADING ---
-// This preloads ALL entrance and corridor textures during the preloader phase
-// Room textures are NOT preloaded - they load on-demand when user clicks a door
-import { PRELOAD_ALL } from './config/texturePreloadList';
+// Preloads ALL textures (entrance, corridor, UI, and all room textures)
+// Everything loads during the preloader for zero stutter when entering rooms
+import { PRELOAD_ALL, PRELOAD_LOADER } from './config/texturePreloadList';
+import { TextureLoader } from 'three';
 PRELOAD_ALL.forEach(path => useTexture.preload(path));
+PRELOAD_LOADER.forEach(path => useLoader.preload(TextureLoader, path));
 
 const FONT_URL = 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff';
 

@@ -1,13 +1,13 @@
-import { useMemo, memo, lazy, Suspense, useEffect } from 'react';
+import { useMemo, memo, Suspense, useEffect } from 'react';
 import { Text } from '@react-three/drei';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Lazy load room components
-const GalleryRoom = lazy(() => import('../rooms/Gallery/GalleryRoom'));
-const StudioRoom = lazy(() => import('../rooms/Studio/StudioRoom'));
-const AboutRoom = lazy(() => import('../rooms/About/AboutRoom'));
-const ContactRoom = lazy(() => import('../rooms/Contact/ContactRoom'));
+// Eagerly import room components - textures are preloaded during the preloader phase
+import GalleryRoom from '../rooms/Gallery/GalleryRoom';
+import StudioRoom from '../rooms/Studio/StudioRoom';
+import AboutRoom from '../rooms/About/AboutRoom';
+import ContactRoom from '../rooms/Contact/ContactRoom';
 
 // Room configurations
 const ROOM_CONFIG = {
@@ -41,10 +41,10 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
     const roomZ = -corridorDepth - roomDepth / 2;
 
     // Load corridor textures
-    const floorTexSrc = useTexture('/textures/corridor/kawalekpodlogi.png');
+    const floorTexSrc = useTexture('/textures/corridor/kawalekpodlogi.webp');
     const wallTexSrc = useTexture('/textures/corridor/wall_texture.webp');
     const ceilingTexSrc = useTexture('/textures/corridor/ceiling_texture.webp');
-    const bbTexSrc = useTexture('/textures/corridor/texturadoprogow.png');
+    const bbTexSrc = useTexture('/textures/corridor/texturadoprogow.webp');
 
     // Memoize textured materials for mini-corridor
     const materials = useMemo(() => {

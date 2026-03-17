@@ -176,8 +176,8 @@ const GalleryRoom = ({ showRoom, onReady, isExiting }) => {
     const paintedTextures = useTexture(paintedUrls);
 
     // Load the universal back texture and the button texture conditionally
-    const backTextureRaw = useTexture(isMobile ? '/textures/gallery/tylkartki.webp' : '/textures/gallery/tylkartki_painted.png');
-    const overlayTextureRaw = useTexture(isMobile ? '/textures/gallery/przyciskdotylukartki.webp' : '/textures/gallery/przyciskdotylukartki_painted.png');
+    const backTextureRaw = useTexture(isMobile ? '/textures/gallery/tylkartki.webp' : '/textures/gallery/tylkartki_painted.webp');
+    const overlayTextureRaw = useTexture(isMobile ? '/textures/gallery/przyciskdotylukartki.webp' : '/textures/gallery/przyciskdotylukartki_painted.webp');
 
     // Preload tech stack logos to prevent stuttering on first flip
     const allLogos = [
@@ -337,7 +337,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting }) => {
                     // Use existing baseboard texture logic if available, or load new
                     // Since we don't have it loaded here, let's load it or borrow it
                     // Better to load it cleanly here
-                    const t = new THREE.TextureLoader().load('/textures/corridor/texturadoprogow.png');
+                    const t = new THREE.TextureLoader().load('/textures/corridor/texturadoprogow.webp');
                     t.colorSpace = THREE.SRGBColorSpace;
                     t.wrapS = t.wrapT = THREE.RepeatWrapping;
                     t.repeat.set(15 / 2.524, 1); // 15 width / ~2.5 unit per tile
