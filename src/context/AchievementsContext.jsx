@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAudio } from './AudioManager';
-import posthog from 'posthog-js';
+// import posthog from 'posthog-js';
 
 const AchievementsContext = createContext();
 
@@ -22,7 +22,7 @@ export const AchievementsProvider = ({ children }) => {
     // Load completed achievements from local storage
     const [completed, setCompleted] = useState(() => {
         try {
-            const saved = localStorage.getItem('itom_achievements');
+            const saved = localStorage.getItem('nari_achievements');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 // Wrzucamy do pule, ale ignorujemy 'corridor_enter' żeby tooltip wejściowy zawsze się pojawiał
@@ -96,7 +96,7 @@ export const AchievementsProvider = ({ children }) => {
     // Save to localStorage when completed changes
     useEffect(() => {
         const toSave = completed.filter(id => id !== 'corridor_enter');
-        localStorage.setItem('itom_achievements', JSON.stringify(toSave));
+        localStorage.setItem('nari_achievements', JSON.stringify(toSave));
     }, [completed]);
 
     const showTutorial = useCallback((id) => {
@@ -123,14 +123,14 @@ export const AchievementsProvider = ({ children }) => {
                 return updated;
             });
 
-            // Send event to PostHog
-            const achievementData = ACHIEVEMENTS[id];
-            if (achievementData) {
-                posthog.capture('achievement_unlocked', {
-                    achievement_id: id,
-                    achievement_title: achievementData.title,
-                });
-            }
+            // PostHog analytics disabled
+            // const achievementData = ACHIEVEMENTS[id];
+            // if (achievementData) {
+            //     posthog.capture('achievement_unlocked', {
+            //         achievement_id: id,
+            //         achievement_title: achievementData.title,
+            //     });
+            // }
 
             // Trigger sound effect
             playUnlockChime();

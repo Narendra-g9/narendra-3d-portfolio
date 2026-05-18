@@ -35,40 +35,49 @@ export const GALLERY_INTERACTION_AUDIO_SETTINGS = {
 // Define the unique projects and their textures
 const UNIQUE_PROJECTS = [
     {
-        id: 'monetune',
-        title: 'MONETUNE',
+        id: 'employee-mgmt',
+        title: 'EMP MANAGER',
         front: '/textures/gallery/monetuneprzod.webp',
         painted: '/textures/gallery/monetuneprzod_painted.webp',
-        url: 'https://monetune.pl',
-        description: 'MoneTune is a step-by-step blueprint that teaches beginners how to generate passive income using AI-created music. Without any musical skills, you will learn how to easily produce professional tracks, publish them on platforms like Spotify, and monetize your digital assets.',
-        techStack: ['/textures/gallery/wordpresslogo.webp', '/textures/gallery/elementorlogo.webp', '/textures/gallery/phplogo.webp', '/textures/gallery/csslogo.webp']
+        url: 'https://emp-manage-system-delta.vercel.app',
+        description: 'A full-stack Employee Management System with role-based access control (Admin, Manager, Employee). Features include employee CRUD operations, department management, role-based dashboards, and a responsive UI. Built with React, Django REST Framework, and SQL.',
+        techStack: ['/textures/gallery/reactlogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/firebaselogo.webp']
     },
     {
-        id: 'timber',
-        title: 'TIMBERKITTY',
+        id: 'auth-system',
+        title: 'AUTH SYSTEM',
         front: '/textures/gallery/timberkittyprzod.webp',
         painted: '/textures/gallery/timberkittyprzod_painted.webp',
-        url: 'https://timberkitty.netlify.app',
-        description: 'TimberKitty is an addictive, free-to-play browser arcade game built in pure JavaScript. Players control a lumberjack cat to chop wood, save birds, complete daily missions, and compete on global leaderboards.',
-        techStack: ['/textures/gallery/jslogo.webp', '/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/firebaselogo.webp']
+        url: 'https://auth-demo-project-3.onrender.com/',
+        description: 'A secure authentication module featuring session-based login, user registration, password reset with email OTP, and token-based authentication. Built with Django, React, and REST API with proper security measures.',
+        techStack: ['/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/reactlogo.webp']
     },
     {
-        id: 'young',
-        title: 'YOUNG MULTI',
+        id: 'banking',
+        title: 'BANK BUDDY',
         front: '/textures/gallery/youngmultiprzod.webp',
         painted: '/textures/gallery/youngmultiprzod_painted.webp',
-        url: 'https://young-multi-strona.netlify.app',
-        description: 'A sleek, modern concept website dedicated to the Polish rapper and creator Young Multi. It serves as a promotional landing page designed to highlight his personal brand, music, and online presence.',
-        techStack: ['/textures/gallery/reactlogo.webp', '/textures/gallery/tailwindlogo.webp', '/textures/gallery/htmllogo.webp', '/textures/gallery/netlifylogo.webp']
+        url: 'https://bank-buddy.onrender.com',
+        description: 'A comprehensive Banking Management System with Admin and User roles, featuring loan management, transaction history, account operations, and robust role-based access control. Built with Python, Django, React, JavaScript, and SQL.',
+        techStack: ['/textures/gallery/reactlogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp']
     },
     {
-        id: 'bio',
-        title: 'BIO',
+        id: 'hostel-mgmt',
+        title: 'HOSTEL MGMT',
         front: '/textures/gallery/bioprzod.webp',
         painted: '/textures/gallery/bioprzod_painted.webp',
-        url: 'https://tomkingbio.netlify.app',
-        description: 'A fast, modern personal bio page serving as a central hub for my digital footprint. It showcases my latest coding projects, web development services, YouTube videos, and recommended music artists.',
-        techStack: ['/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/netlifylogo.webp']
+        url: 'https://hostel-register--purnaanil8.replit.app',
+        description: 'A modern Hostel Management & Registration System featuring a multi-step registration wizard, secure admin dashboard for managing residents, facility showcase, and dark/light theme toggle. Built with React, Tailwind CSS, and Shadcn UI.',
+        techStack: ['/textures/gallery/reactlogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/htmllogo.webp']
+    },
+    {
+        id: '3d-portfolio',
+        title: '3D PORTFOLIO',
+        front: '/textures/gallery/monetuneprzod.webp',
+        painted: '/textures/gallery/monetuneprzod_painted.webp',
+        url: '#',
+        description: 'This immersive 3D portfolio you are exploring right now! Built with React Three Fiber, Three.js, and GSAP, featuring interactive rooms, hand-drawn aesthetics, and creative web experiences.',
+        techStack: ['/textures/gallery/reactlogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/htmllogo.webp']
     },
 ];
 
