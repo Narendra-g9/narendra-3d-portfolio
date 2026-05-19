@@ -450,7 +450,7 @@ const AWARDS_DATA = {
         layout: 'certificate_grid',
         title: 'Education',
         items: [
-            { label: 'B.Tech CSE - KHIT', date: '2021-2025', image: '/textures/about/FEATURED.webp', url: '#' },
+            { label: 'B.Tech CSE - KHIT', date: '2021-2025', image: '/textures/about/khit_education.jpg', url: '#' },
         ],
         platformConfig: {
             label: 'EDUCATION',
@@ -498,10 +498,10 @@ const AwardsMilestone = ({ z, scrollProgressRef }) => {
     // Load textures
     const sotyTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTY.webp');
     const sotdTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTD.webp');
-    const sotmTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTM.webp');
+    const sotmTexture = useLoader(THREE.TextureLoader, '/textures/about/khit_education.jpg');
     const sotyPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTY.webp' : '/textures/about/SOTY_painted.webp');
     const sotdPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTD.webp' : '/textures/about/SOTD_painted.webp');
-    const sotmPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTM.webp' : '/textures/about/SOTM_painted.webp');
+    const sotmPaintedTexture = useLoader(THREE.TextureLoader, '/textures/about/khit_education.jpg');
     const buttonTexture = useLoader(THREE.TextureLoader, '/textures/about/button.webp');
     const buttonPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/button.webp' : '/textures/about/button_painted.webp');
 
